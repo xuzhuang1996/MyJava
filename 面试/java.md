@@ -1282,4 +1282,10 @@ https://juejin.im/post/5b625b9be51d4519956759d0
       - 行为多态：同一个run( ){ }方法，不同的对象调用时会有不同的实现，猫调用时是跑，鱼调用时是游，鸟调用时是飞。
       - 对象多态：同一个对象，可以被造型为不同的类型，比如同一个人对象，可以被造型为儿子，父亲，员工等。
 
-
+12. servlet
+    1. Servlet_生命周期：首先加载servlet的class，实例化servlet，然后初始化servlet调用init()的方法，接着调用服务的service的方法处理doGet和doPost方法，最后是我的还有容器关闭时候调用destroy 销毁方法。
+    1. 被创建：执行init方法，只执行一次
+       - 默认情况下，第一次被访问时，Servlet被创建，然后执行init方法；
+       - 可以配置执行Servlet的创建时机；
+    2. 提供服务：执行service方法，执行多次
+    3.被销毁：当Servlet服务器正常关闭时，执行destroy方法，只执行一次
