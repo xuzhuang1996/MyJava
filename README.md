@@ -47,7 +47,12 @@
    4. Function接口：
       - [Function<T, R>，T—函数的输入类型，R-函数的输出类型。](https://www.orchome.com/935)lambda的写法就是Function内部写一个方法T为输入，使用的时候调用apply或者compose等就是相当于重写了该方法，获取返回。
       - 当然，对于需要重复使用的Function，可以事前定义好，像写函数一样，在具体使用的时候直接赋值。然后调用时直接用apply方法传参数就好了。
-
+   5. 流转数组
+      
+          Integer[] integers = Stream.of(1, 2, 3, 4, 5).toArray(Integer[]::new);
+   6. 转Map等
+   
+          employees.stream().collect(Collectors.toMap( e -> e.getEmpId(),  e -> e));
 3. 继承与接口
    1. 抽象类
       - 希望在几个密切相关的类之间共享代码
