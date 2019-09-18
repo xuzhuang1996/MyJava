@@ -972,6 +972,9 @@
 7. java.lang.OutOfMemoryError：内存不足错误。
 8. java.lang.StackOverflowError：堆栈溢出错误。当一个应用递归调用的层次太深而导致堆栈溢出时抛出该错误。
 9. java.lang.UnsupportedClassVersionError。JDK版本不同异常。换一个打包版本就行
+10. [异常捕获后何时抛出？何时自己处理？](https://juejin.im/post/5ae66791f265da0b92655c5d)
+    1. 尽量将异常统一抛给上层调用者，由上层调用者统一之时如何进行处理。如果在每个出现异常的地方都直接进行处理，会导致程序异常处理流程混乱，不利于后期维护和异常错误排查。由上层统一进行处理会使得整个程序的流程清晰易懂。 
+
 ## io
 
 ### NIO
