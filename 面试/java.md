@@ -1292,3 +1292,14 @@ https://juejin.im/post/5b625b9be51d4519956759d0
        - 可以配置执行Servlet的创建时机；
     2. 提供服务：执行service方法，执行多次
     3.被销毁：当Servlet服务器正常关闭时，执行destroy方法，只执行一次
+13. 求质因数
+
+        int n = 900;
+        for (int i = 2; i <= Math.sqrt(n); i++) {
+            if(n % i == 0){
+                System.out.print(i + "*");
+                n /= i;
+                i--;
+            }
+        }
+        System.out.println(n);
