@@ -841,7 +841,7 @@
    
      <img src="https://github.com/xuzhuang1996/MyJava/blob/master/img/面试/8jvmParNew.png" width=50% height=50% />
 
-3. Parallel Scavenge收集器，使用复制算法、并行。
+3. Parallel Scavenge新生代收集器，使用复制算法、并行。
    - 参数控制：-XX:+UseParallelGC  使用Parallel收集器+老年代串行
    - 老年版Parallel Old 收集器:-XX:+UseParallelOldGC 使用Parallel收集器+ 老年代并行
      >Parallel Scavenge收集器关注点是吞吐量（高效率的利用CPU）。CMS等垃圾收集器的关注点更多的是用户线程的停顿时间（提高用户体验）。所谓吞吐量就是CPU中用于运行用户代码的时间与CPU总消耗时间的比值
