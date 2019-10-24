@@ -1013,8 +1013,8 @@
    2. poll,和select函数一样，poll返回后，需要轮询pollfd来获取就绪的描述符。select和poll都需要在返回后，通过遍历文件描述符来获取已经就绪的socket。事实上，同时连接的大量客户端在一时刻可能只有很少的处于就绪状态，因此随着监视的描述符数量的增长，其效率也会线性下降。底层链表。
    3. epoll。底层红黑树
       1. `int epoll_create(int size);`,创建一个epoll的句柄，参数size并不是限制了epoll所能监听的描述符最大个数，只是对内核初始分配内部数据结构的一个建议
-      2. `int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)；`对指定描述符fd执行op操作，即红黑树进行增删改
-      3. `int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout);`返回需要处理的事件数目，如返回0表示已超时。
+      2. `int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event)；`对指定描述符fd执行op操作，将描述符和感兴趣的事件注册到epoll实例，即红黑树进行增删改
+      3. `int epoll_wait(int epfd, struct epoll_event * events, int maxevents, int timeout);`阻塞等待IO事件,返回需要处理的事件数目，并会将就绪的描述符存储到events参数中。如返回0表示已超时。
    4. epoll对上面2个的缺点处理：
       1. 监视的描述符数量不受限制，就是树的大小。
       1. 遍历：epoll事先通过epoll_ctl()来注册一个文件描述符，一旦基于某个文件描述符就绪时，内核会采用类似callback的回调机制，迅速激活这个文件描述符，当进程调用epoll_wait() 时便得到通知。此处去掉了遍历文件描述符，而是通过监听回调的的机制。
