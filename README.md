@@ -32,27 +32,7 @@
    - `<? extends T>`,上界通配符。能放一切继承自T的类.频繁往外读取内容的,适合用<? extends T >。
    - `<? super T>`,下界通配符。能放T及T继承的类，但不能放T的派生类。经常往里插入的,适合用 <? super T> 。
    
-2. 新特性：
-   1. default接口
-   2. `::`，[双冒号](https://www.cnblogs.com/tietazhan/p/7486937.html)
-   3. lambda。都在Function包下。以及[流](https://blog.csdn.net/lidai352710967/article/details/82496783).注意：所有 Stream 的操作必须以 lambda 表达式为参数
-   4. [流stream的原理](https://www.ibm.com/developerworks/cn/java/j-lo-java8streamapi/)。这篇文章学习流必须看。
-      1. 操作包括：
-        - Intermediate：map (mapToInt, flatMap 等)、 filter、 distinct、 sorted、 peek、 limit、 skip、 parallel、 sequential、 unordered。Intermediate 操作永远是惰性化的。
-        - Terminal：forEach、 forEachOrdered、 toArray、 reduce、 collect、 min、 max、 count、 anyMatch、 allMatch、 noneMatch、 findFirst、 findAny、 iterator
-        - Short-circuiting：anyMatch、 allMatch、 noneMatch、 findFirst、 findAny、 limit
-      2. 一次性使用。terminal操作之后无法再次进行terminal操作。
-      3.  可以并行计算。缺点是结果打乱之前顺序
-      4. 注意：reduce(),如果没有设置初始种子，返回的是 Optional，也就是可能没有值进行reduce操作。而如果指定了初始值，就返回具体的对象 
-   4. Function接口：
-      - [Function<T, R>，T—函数的输入类型，R-函数的输出类型。](https://www.orchome.com/935)lambda的写法就是Function内部写一个方法T为输入，使用的时候调用apply或者compose等就是相当于重写了该方法，获取返回。
-      - 当然，对于需要重复使用的Function，可以事前定义好，像写函数一样，在具体使用的时候直接赋值。然后调用时直接用apply方法传参数就好了。
-   5. 流转数组
-      
-          Integer[] integers = Stream.of(1, 2, 3, 4, 5).toArray(Integer[]::new);
-   6. 转Map等
-   
-          employees.stream().collect(Collectors.toMap( e -> e.getEmpId(),  e -> e));
+
 3. 继承与接口
    1. 抽象类
       - 希望在几个密切相关的类之间共享代码
