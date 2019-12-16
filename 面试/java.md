@@ -1,13 +1,152 @@
-## 杂
+## 开发常识
 1. 发布一个http接口需要考虑哪些方面：
    - 协议(get post)
    - 安全(白名单，权限管理：token，sql注入等)
    - 考虑前后端分离(所以用json格式当参数和返回值，另外可以传设备类型到后台，aop统计不同设备调用次数)
    
+## Lambda系列
+1. 前提：
+   1. 方法的参数或者局部变量类型必须为接口。抽象类都不行
+   2. 接口中有且仅有一个抽象方法。（equal方法因为object已实现不算，default修饰的方法也不算）
+3. lambda例子
+
+         //最初。匿名的内部类不能访问外部的索引值。如果只是一个值，没有修改过，那是可以访问的，但是如果修改过就不能使用，即需要final，即使不声明，也不能修改。
+         ExecutorService executorService = Executors.newFixedThreadPool(10);
+         for(int i = 0; i < 5; i++) {
+           int temp = i;
+           executorService.submit(new Runnable() {
+             public void run() {
+               //If uncommented the next line will result in an error
+               //System.out.println("Running task " + i); 
+               //local variables referenced from an inner class must be final or effectively final
+
+               System.out.println("Running task " + temp); 
+             }
+           });
+         }
+         executorService.shutdown();
+         
+         //一次演变
+         ExecutorService executorService = Executors.newFixedThreadPool(10)；            
+         IntStream.range(0, 5)
+          .forEach(i -> 
+            executorService.submit(new Runnable() {
+              public void run() {
+                System.out.println("Running task " + i); 
+              }
+            }));
+         executorService.shutdown();
+         
+         //二次演变
+         IntStream.range(0, 5)
+                  .forEach(i -> executorService.submit(() -> System.out.println("Running task " + i)));
+                  
+4. 将一个list中所有元素合在一起：不用reduce
+
+         names.stream()
+              .collect(Collectors.joining(", "))
+              
+5. 尽管lambda 表达式没有任何错误，但它的语法对于当前这个任务而言过于复杂。为了理解 (parameters) -> body 的用途，我们需要进入 body（在 -> 的右侧）来查看该形参发生了什么。如果该lambda表达式没有对该形参执行任何实际操作，则付出的努力就白费了。在此情况下，将传递 lambda 表达式替换为方法引用会比较有益。
+
+         numbers.stream()
+                .forEach(e -> System.out.println(e));
+                
+         numbers.stream()
+                .forEach(System.out::println);
+   如果 lambda 表达式的目的仅是将一个形参传递给实例方法，那么可以将它替换为实例上的方法引用
+   
+         e -> this.increment(e)
+         this::increment
+   如果传递表达式要传递给静态方法，可以将它替换为类上的方法引用
+   
+         e -> Integer.valueOf(e)
+         Integer::valueOf
+   如果形参是方法调用的目标,跟静态类似
+   
+         .map(e -> e.doubleValue())
+         className::doubleValue
+    一个构造函数调用
+    
+         .collect(toCollection(() -> new LinkedList<Double>()));
+         .collect(toCollection(LinkedList::new));
+    reduce传递2个参数的调用
+    
+         .reduce(0, (total, e) -> Integer.sum(total, e)));
+         .reduce(0, Integer::sum));
+6. lambda中闭包携带状态的方式是：闭包保留着 状态value 的一个副本
+
+### lambda原理：
+1. 实例：
+   
+            //目的接口，
+            interface Swim{
+                void fun();
+            }
+            public class Lambda {
+                public static void main(String[] args) {
+                    fun(() -> System.out.println("6"));
+                }
+                /**匿名内部类方式，
+                fun(new Swim() {
+                  @Override
+                  public void fun() {
+                      System.out.println("6");
+                  }
+                });**/
+                
+                public static void fun(Swim swim){
+                    swim.fun();
+                }
+            }
+2. lambda会在该类Lambda中生成一个私有静态方法，比如mian方法中第一次使用lambda：`lambda$main$0`，方法中的内容为lambda的表达式内容
+     
+              //javap -c -p C:\Users\wd\IdeaProjects\untitled\out\production\untitled\Lambda.class获取如下信息
+              public class Lambda {
+                 public Lambda();
+                   Code:
+                      0: aload_0
+                      1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+                      4: return
+
+                 public static void main(java.lang.String[]);
+                   Code:
+                      0: invokedynamic #2,  0              // InvokeDynamic #0:fun:()LSwim;
+                      5: invokestatic  #3                  // Method fun:(LSwim;)V
+                      8: return
+
+                 public static void fun(Swim);
+                   Code:
+                      0: aload_0
+                      1: invokeinterface #4,  1            // InterfaceMethod Swim.fun:()V
+                      6: return
+
+                 private static void lambda$main$0();
+                   Code:
+                      0: getstatic     #5                  // Field java/lang/System.out:Ljava/io/PrintStream;
+                      3: ldc           #6                  // String 6
+                      5: invokevirtual #7                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
+                      8: return
+               }
+2. 然后在运行中动态生成一个内部类，实现目的接口Swim，并重写抽象方法，重写内容就是调用原先类新增的静态私有方法`Lambda.lambda$main$0();`。具体类生成方式：在`C:\Users\wd\IdeaProjects\untitled\out\production\untitled>`目录下执行命令：`java -Djdk.internal.lambda.dumpProxyClasses com.Lambda`,在正常的Java执行命令下加上这个参数，即可保存lambda动态生成的匿名内部类class数据到一个文件中。
+    
+            package com;
+            import java.lang.invoke.LambdaForm.Hidden;
+
+            // $FF: synthetic class
+            final class Lambda$$Lambda$1 implements Swim {
+                private Lambda$$Lambda$1() {
+                }
+
+                @Hidden
+                public void fun() {
+                    Lambda.lambda$main$0();
+                }
+            }
+
 ## Java8新特性：
 1. default接口
 2. `::`，[双冒号](https://www.cnblogs.com/tietazhan/p/7486937.html)
-   1. `Function<String, String> f = String::toUpperCase`,这里通过这种方式调用成员方法，将其赋值给Function，则默认Function的第一个参数为该类的实例对象。
+   1. `Function<String, String> f = String::toUpperCase`,这里通过这种方式调用成员方法，将其赋值给Function，则默认Function的第一个参数为该类的实例对象。如果toUpperCase有参数，则不能使用该方式调用，除非重载的方法没有参数。
 3. lambda。都在Function包下。以及[流](https://blog.csdn.net/lidai352710967/article/details/82496783).注意：所有 Stream 的操作必须以 lambda 表达式为参数
 4. [流stream的原理](https://www.ibm.com/developerworks/cn/java/j-lo-java8streamapi/)。这篇文章学习流必须看。
    1. 操作包括：
@@ -60,7 +199,10 @@
             }
 1. BiFunction，如果想利用Function接口实现两个输入参数一个输出，做不到，因此有了BiFunction。不过BiFunction只有andThen方法，因为BiFunction只能返回一个输出，compose中将Function作为输入的话，下一个执行的行为是BiFunction，需要2个输入，不可。
 1. Predicate接口，针对一个参数的，用于判断lambda的方法体中表达式真假。跟Function接口一样，将判断作为一种行为抽象出来，作为参数传递。
-
+1. Supplier接口，不需要参数，返回一个结果。一般用于工厂方法。
+1. BinaryOperator接口，`interface BinaryOperator<T> extends BiFunction<T,T,T>`,用法我觉得跟C++的operator类似。定义两个对象之间的计算得到另一个对象。当然远不止这样的功能。比如在该接口中只有2个静态方法：
+   1. minBy(Comparator<T> c),返回两个对象间较小的一个。
+   2. maxBy()
 ### ForkJoin
 1. parallelStream底层使用该框架，将一个大任务拆分为很多小任务来异步执行。包含三个模块：
    1. 线程池ForkJoinPool,继承自AbstractExecutorService,
@@ -209,144 +351,6 @@
    
    
    
-## Lambda系列
-1. 前提：
-   1. 方法的参数或者局部变量类型必须为接口。抽象类都不行
-   2. 接口中有且仅有一个抽象方法
-3. lambda例子
-
-         //最初。匿名的内部类不能访问外部的索引值。如果只是一个值，没有修改过，那是可以访问的，但是如果修改过就不能使用，即需要final，即使不声明，也不能修改。
-         ExecutorService executorService = Executors.newFixedThreadPool(10);
-         for(int i = 0; i < 5; i++) {
-           int temp = i;
-           executorService.submit(new Runnable() {
-             public void run() {
-               //If uncommented the next line will result in an error
-               //System.out.println("Running task " + i); 
-               //local variables referenced from an inner class must be final or effectively final
-
-               System.out.println("Running task " + temp); 
-             }
-           });
-         }
-         executorService.shutdown();
-         
-         //一次演变
-         ExecutorService executorService = Executors.newFixedThreadPool(10)；            
-         IntStream.range(0, 5)
-          .forEach(i -> 
-            executorService.submit(new Runnable() {
-              public void run() {
-                System.out.println("Running task " + i); 
-              }
-            }));
-         executorService.shutdown();
-         
-         //二次演变
-         IntStream.range(0, 5)
-                  .forEach(i -> executorService.submit(() -> System.out.println("Running task " + i)));
-                  
-4. 将一个list中所有元素合在一起：不用reduce
-
-         names.stream()
-              .collect(Collectors.joining(", "))
-              
-5. 尽管lambda 表达式没有任何错误，但它的语法对于当前这个任务而言过于复杂。为了理解 (parameters) -> body 的用途，我们需要进入 body（在 -> 的右侧）来查看该形参发生了什么。如果该lambda表达式没有对该形参执行任何实际操作，则付出的努力就白费了。在此情况下，将传递 lambda 表达式替换为方法引用会比较有益。
-
-         numbers.stream()
-                .forEach(e -> System.out.println(e));
-                
-         numbers.stream()
-                .forEach(System.out::println);
-   如果 lambda 表达式的目的仅是将一个形参传递给实例方法，那么可以将它替换为实例上的方法引用
-   
-         e -> this.increment(e)
-         this::increment
-   如果传递表达式要传递给静态方法，可以将它替换为类上的方法引用
-   
-         e -> Integer.valueOf(e)
-         Integer::valueOf
-   如果形参是方法调用的目标,跟静态类似
-   
-         .map(e -> e.doubleValue())
-         className::doubleValue
-    一个构造函数调用
-    
-         .collect(toCollection(() -> new LinkedList<Double>()));
-         .collect(toCollection(LinkedList::new));
-    reduce传递2个参数的调用
-    
-         .reduce(0, (total, e) -> Integer.sum(total, e)));
-         .reduce(0, Integer::sum));
-6. lambda中闭包携带状态的方式是：闭包保留着 状态value 的一个副本
-
-### lambda原理：
-1. 实例：
-   
-            //目的接口，
-            interface Swim{
-                void fun();
-            }
-            public class Lambda {
-                public static void main(String[] args) {
-                    fun(() -> System.out.println("6"));
-                }
-                /**匿名内部类方式，
-                fun(new Swim() {
-                  @Override
-                  public void fun() {
-                      System.out.println("6");
-                  }
-                });**/
-                
-                public static void fun(Swim swim){
-                    swim.fun();
-                }
-            }
-2. lambda会在该类Lambda中生成一个私有静态方法，比如mian方法中第一次使用lambda：`lambda$main$0`，方法中的内容为lambda的表达式内容
-     
-              //javap -c -p C:\Users\wd\IdeaProjects\untitled\out\production\untitled\Lambda.class获取如下信息
-              public class Lambda {
-                 public Lambda();
-                   Code:
-                      0: aload_0
-                      1: invokespecial #1                  // Method java/lang/Object."<init>":()V
-                      4: return
-
-                 public static void main(java.lang.String[]);
-                   Code:
-                      0: invokedynamic #2,  0              // InvokeDynamic #0:fun:()LSwim;
-                      5: invokestatic  #3                  // Method fun:(LSwim;)V
-                      8: return
-
-                 public static void fun(Swim);
-                   Code:
-                      0: aload_0
-                      1: invokeinterface #4,  1            // InterfaceMethod Swim.fun:()V
-                      6: return
-
-                 private static void lambda$main$0();
-                   Code:
-                      0: getstatic     #5                  // Field java/lang/System.out:Ljava/io/PrintStream;
-                      3: ldc           #6                  // String 6
-                      5: invokevirtual #7                  // Method java/io/PrintStream.println:(Ljava/lang/String;)V
-                      8: return
-               }
-2. 然后在运行中动态生成一个内部类，实现目的接口Swim，并重写抽象方法，重写内容就是调用原先类新增的静态私有方法`Lambda.lambda$main$0();`。具体类生成方式：在`C:\Users\wd\IdeaProjects\untitled\out\production\untitled>`目录下执行命令：`java -Djdk.internal.lambda.dumpProxyClasses com.Lambda`,在正常的Java执行命令下加上这个参数，即可保存lambda动态生成的匿名内部类class数据到一个文件中。
-    
-            package com;
-            import java.lang.invoke.LambdaForm.Hidden;
-
-            // $FF: synthetic class
-            final class Lambda$$Lambda$1 implements Swim {
-                private Lambda$$Lambda$1() {
-                }
-
-                @Hidden
-                public void fun() {
-                    Lambda.lambda$main$0();
-                }
-            }
 
 
 
