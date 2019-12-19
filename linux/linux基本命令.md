@@ -250,6 +250,7 @@ Sed主要用来自动编辑一个或多个文件；简化对文件的反复操�
   - '>'是输出重定向符
 1. E: 无法获得锁 /var/lib/apt/lists/lock - open (11: Resource temporarily unavailable)”
   - `sudo rm /var/lib/dpkg/lock`
+1. 修改IP地址，最后一般需要`sudo /etc/init.d/networking restart`重启服务生效
 ## EXt2、Ext3
 EXT2、EXT3：linux环境上的文件系统。ext2/ext3文件系统使用索引节点来记录文件信息，作用像windows的文件分配表。索引节点是一个结构，它包含了一个文件的长度、创建及修改时间、权限、所属关系、磁盘中的位置等信息。
 
