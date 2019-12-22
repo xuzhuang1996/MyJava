@@ -158,19 +158,31 @@
 3. lambda。都在Function包下。以及[流](https://blog.csdn.net/lidai352710967/article/details/82496783).注意：所有 Stream 的操作必须以 lambda 表达式为参数
 4. [流stream的原理](https://www.ibm.com/developerworks/cn/java/j-lo-java8streamapi/)。这篇文章学习流必须看。
    1. 操作包括：
-     - Intermediate：map (mapToInt, flatMap 等)、 filter、 distinct、 sorted、 peek、 limit、 skip、 parallel、 sequential、 unordered。Intermediate 操作永远是惰性化的。
+     - Intermediate：map (mapToInt, flatMap 等)、 filter、 distinct、 sorted、 peek、 limit、 skip、 parallel、 sequential、 unordered。Intermediate 操作永远是惰性化的。也就是说没有Terminal操作，Intermediate操作并不会执行，比如在Intermediate中打印数据则不会打印出来。
      - Terminal：forEach、 forEachOrdered、 toArray、 reduce、 collect、 min、 max、 count、 anyMatch、 allMatch、 noneMatch、 findFirst、 findAny、 iterator
      - Short-circuiting：anyMatch、 allMatch、 noneMatch、 findFirst、 findAny、 limit
    2. 一次性使用。terminal操作之后无法再次进行terminal操作。
    3. 可以并行计算parallelStream。缺点是结果打乱之前顺序,以及线程安全问题。
    4. 注意：reduce(),如果没有设置初始种子，返回的是 Optional，也就是可能没有值进行reduce操作。而如果指定了初始值，就返回具体的对象 
+
 5. 流转数组
 
        Integer[] integers = Stream.of(1, 2, 3, 4, 5).toArray(Integer[]::new);
 6. 转Map等
 
        employees.stream().collect(Collectors.toMap( e -> e.getEmpId(),  e -> e));
- 
+4. IntStream数值流，[为了减少Integer与int计算时的拆装箱问题而引入](https://www.jianshu.com/p/e429c517e9cb)。
+   1. iterate ： 依次对每个新生成的值应用函数
+   
+            //生成流，首元素为 0，之后依次加 2
+            Stream.iterate(0, n -> n + 2)
+   2. 注意流的使用顺序
+   
+          //输出0.1后继续运行
+          IntStream.iterate(0, i -> (i + 1) % 2).distinct().limit(6).forEach(System.out::println);
+          //输出0.1后停止
+          IntStream.iterate(0, i -> (i + 1) % 2).limit(6).distinct().forEach(System.out::println); 
+
 ### 函数式编程思想
 4. Function接口，一般将函数作为参数进行引用传递，需要关注的是Function本身是一种行为。
    1. [Function<T, R>，T—函数的输入类型，R-函数的输出类型。](https://www.orchome.com/935)lambda的写法就是Function内部写一个方法T为输入，使用的时候调用apply或者compose等就是相当于重写了该方法，获取返回。因为apply方法是必须实现的，而compose、andThen是default关键字修饰。
