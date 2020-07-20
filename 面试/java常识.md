@@ -648,6 +648,7 @@
 
            select name, country, password from Users where email = 'david@gmail.com\' or \'1\'=\'1\' and password=''
    2. Mybatis中`$`等同于字符串拼接，而`#`才是真正的语义逻辑与数据分离。
+   3. 如果非得拼接，如in的情况。可以考虑进行SQL校验，对影响结果的特殊字符进行转义，常见工具如ESAPI。
 1. [限流](https://juejin.im/entry/5b4d8a8ce51d451908695590)
    1. 漏桶算法:准备一个队列，用来保存请求，另外通过一个线程池定期从队列中获取请求并执行，可以一次性获取多个并发执行。1000ms处理100个请求，则通过漏桶算法进行限流，每10毫秒处理一次请求。
 1. [大数据排序](https://www.cnblogs.com/menghuizuotian/p/3840974.html):结合算法中的K链表合并方法
