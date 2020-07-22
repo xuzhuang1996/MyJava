@@ -11,6 +11,7 @@
 5. 选中方法，ctrl+F7。跳转到调用该方法的位置。
 6. ctrl+shift+N，查文件名
 6. ctrl+shift+A，查设置，比如设置背景background
+1. Ctrl + Alt + 左箭头，跳转方法后返回
 
 ------------------
 ## markdown：
