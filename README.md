@@ -12,7 +12,7 @@
 6. ctrl+shift+N，查文件名
 6. ctrl+shift+A，查设置，比如设置背景background
 1. Ctrl + Alt + 左箭头，跳转方法后返回
-
+1. ctrl + alt +B，查看接口实现
 ------------------
 ## markdown：
 
