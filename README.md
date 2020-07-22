@@ -51,7 +51,7 @@
    - `git stash list`,查看当前stash中的内容
    - `git stash pop`,将当前stash中的内容弹出，并应用到当前分支对应的工作目录上。
    - `git stash apply`,将堆栈中的内容应用到当前目录，不同于git stash pop，该命令不会将内容从堆栈中删除，也就说该命令能够将堆栈的内容多次应用到工作目录中，适应于多个分支的情况。
-   
+   - `git clone -b dev_jk http://10.1.1.11/service/tmall-service.git`指定分支下载
 ------------
 ## mysql
 1. Ubuntu下sudo能无密码访问，但是普通用户无法登录。这样就可以密码登录
