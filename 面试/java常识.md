@@ -331,6 +331,13 @@
 ### Instant
 1. 时间戳，用于处理1970.1.1 00:00:00以来的秒与纳秒
 
+### String
+1. replace方法：支持字符和字符串的替换
+2. replaceAll方法：基于正则表达式的字符串替换。
+
+         String str = "Hello Java. Java is a language.";
+         System.out.println(str.replace("Java.", "c++"));//打印 Hello c++ Java is a language.
+         System.out.println(str.replaceAll("Java.", "c++"));//打印 Hello c++ c++is a language.
 ### 注解
 1. 重复注解。一般注解不能在同一个地方使用多次相同注解。
    1. 定义重复注解容器
