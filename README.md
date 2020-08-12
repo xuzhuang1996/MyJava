@@ -13,6 +13,8 @@
 6. ctrl+shift+A，查设置，比如设置背景background
 1. Ctrl + Alt + 左箭头，跳转方法后返回
 1. ctrl + alt +B，查看接口实现
+1. shift + F6，修改变量名。统一修改的那种。
+1. shift + F9 Debug.........shit + F10 Run
 ------------------
 ## markdown：
 
