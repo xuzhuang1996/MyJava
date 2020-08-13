@@ -15,6 +15,7 @@
 1. ctrl + alt +B，查看接口实现
 1. shift + F6，修改变量名。统一修改的那种。
 1. shift + F9 Debug.........shit + F10 Run
+1.在路径中查找搜索
 ------------------
 ## markdown：
 
