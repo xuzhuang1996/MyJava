@@ -57,6 +57,7 @@
    - `git stash apply`,将堆栈中的内容应用到当前目录，不同于git stash pop，该命令不会将内容从堆栈中删除，也就说该命令能够将堆栈的内容多次应用到工作目录中，适应于多个分支的情况。
 9. `git clone -b dev_jk http://10.1.1.11/service/tmall-service.git`指定分支下载
 10. git cherry-pick命令的作用，就是将指定的提交（commit）应用于当前分支。
+11. git status三个区（工作区、暂存区、存储区）的区别，git diff默认暂存区与工作区的区别。
 ------------
 ## mysql
 1. Ubuntu下sudo能无密码访问，但是普通用户无法登录。这样就可以密码登录
