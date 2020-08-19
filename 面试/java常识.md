@@ -159,6 +159,7 @@
 4. [流stream的原理](https://www.ibm.com/developerworks/cn/java/j-lo-java8streamapi/)。这篇文章学习流必须看。
    1. 操作包括：
      - Intermediate：map (mapToInt, flatMap 等)、 filter、 distinct、 sorted、 peek、 limit、 skip、 parallel、 sequential、 unordered。Intermediate 操作永远是惰性化的。也就是说没有Terminal操作，Intermediate操作并不会执行，比如在Intermediate中打印数据则不会打印出来。
+       - arrayList.stream().map(e -> e * 3 + 2).mapToInt(Integer::intValue).sum();
      - Terminal：forEach、 forEachOrdered、 toArray、 reduce、 collect、 min、 max、 count、 anyMatch、 allMatch、 noneMatch、 findFirst、 findAny、 iterator
      - Short-circuiting：anyMatch、 allMatch、 noneMatch、 findFirst、 findAny、 limit
    2. 一次性使用。terminal操作之后无法再次进行terminal操作。
