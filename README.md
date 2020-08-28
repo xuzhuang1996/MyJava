@@ -11,11 +11,16 @@
 5. 选中方法，alt+F7。跳转到调用该方法的位置。
 6. ctrl+shift+N，查文件名
 6. ctrl+shift+A，查设置，比如设置背景background
+1. ctrl+shift+T，创建测试类
 1. Ctrl + Alt + 左箭头，跳转方法后返回
 1. ctrl + alt +B，查看接口实现
 1. shift + F6，修改变量名。统一修改的那种。
 1. shift + F9 Debug.........shit + F10 Run
 1. edit -> find -> find in path，搜索更好用
+1. ctrl + alt + M 抽方法
+2. Ctrl + Alt + T将属性抽出参数。
+1. Alt+Insert，插入代码，包括test、构造函数等很多代码。很常用。
+1. Ctrl+tab，切换类视图，不用鼠标。
 ------------------
 ## markdown：
 
