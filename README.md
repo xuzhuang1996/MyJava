@@ -8,7 +8,7 @@
 2. 键入fori，enter即可。   
 3. 如何像写一个System.out.println();就是sout   
 4. view——>Tool windows——>structure或者alt+7。查看当前类的方法。
-5. 选中方法，ctrl+F7。跳转到调用该方法的位置。
+5. 选中方法，alt+F7。跳转到调用该方法的位置。
 6. ctrl+shift+N，查文件名
 6. ctrl+shift+A，查设置，比如设置背景background
 1. Ctrl + Alt + 左箭头，跳转方法后返回
