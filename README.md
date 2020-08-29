@@ -17,10 +17,13 @@
 1. shift + F6，修改变量名。统一修改的那种。
 1. shift + F9 Debug.........shit + F10 Run
 1. edit -> find -> find in path，搜索更好用
-1. ctrl + alt + M 抽方法
-2. Ctrl + Alt + T将属性抽出参数。
+
 1. Alt+Insert，插入代码，包括test、构造函数等很多代码。很常用。
 1. Ctrl+tab，切换类视图，不用鼠标。
+1. 重构：
+   1. alt + delete 重构：安全删除，看有没有依赖
+   1. ctrl + alt + M 抽方法。
+   2. Ctrl + Alt + T将属性抽出参数。
 ------------------
 ## markdown：
 
