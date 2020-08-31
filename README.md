@@ -24,6 +24,7 @@
    1. alt + delete 重构：安全删除，看有没有依赖
    1. ctrl + alt + M 抽方法。
    2. Ctrl + Alt + T将属性抽出参数。
+   1. Ctrl+shift+Alt+T，抽类，选择delegate
 ------------------
 ## markdown：
 
