@@ -733,3 +733,5 @@
    1. MyBatis的二级缓存相对于一级缓存来说，实现了SqlSession之间缓存数据的共享
    2. MyBatis在多表查询时，极大可能会出现脏数据，有设计上的缺陷，安全使用二级缓存的条件比较苛刻。
    3. 在分布式环境下，由于默认的MyBatis Cache实现都是基于本地的，分布式环境下必然会出现读取到脏数据
+## 调优
+1. [命令](https://blog.csdn.net/fly910905/article/details/87921757)`jstat -gcutil pid interval(ms)`  
