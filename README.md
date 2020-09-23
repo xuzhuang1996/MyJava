@@ -25,6 +25,7 @@
    2. Ctrl + Alt + T将属性抽出参数。
    1. Ctrl+shift+Alt+T，抽类，选择delegate
 1. 比较同一个文件，在两个分支的区别：VCS->Git->Compare with Branch
+1. 比较两个文件不同处：复制一个文件，全选。在另一个文件中右键，选择compare with clipBroad
 ------------------
 ## markdown：
 
