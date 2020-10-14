@@ -26,6 +26,18 @@
    1. Ctrl+shift+Alt+T，抽类，选择delegate
 1. 比较同一个文件，在两个分支的区别：VCS->Git->Compare with Branch
 1. 比较两个文件不同处：复制一个文件，全选。在另一个文件中右键，选择compare with clipBroad
+1. 方法注释：
+   1. 方法注释头：
+   
+           **
+           * @Description
+           *   
+          $param$
+           * @return 
+           **/
+    2. edit变量：
+    
+            groovyScript("def result=''; def params=\"${_1}\".replaceAll('[\\\\[|\\\\]|\\\\s]', '').split(',').toList(); for(i = 0; i < params.size(); i++) {result+=' * @param ' + params[i] + ((i < params.size() - 1) ? '\\n' : '')}; return result", methodParameters())
 ------------------
 ## markdown：
 
