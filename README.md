@@ -131,3 +131,9 @@
    2. 名词设计，表示一个资源或者服务，用名词复数的形式描述某一资源
 3. RESTful 幂等性（多次调用是否会对资源产生影响）原则
 http://www.yymp3.com/Play/12813/163839.htm
+
+1. tmp
+   - https://potoyang.gitbook.io/spring-in-action-v5/di-11-zhang-kai-fa-xiang-ying-shi-api/11.1-shi-yong-spring-webflux
+   - https://developer.ibm.com/zh/depmodels/reactive-systems/tutorials/j-whats-new-in-spring-framework-5-theedom/
+   - https://developer.ibm.com/zh/depmodels/reactive-systems/articles/spring5-webflux-reactive/
+
