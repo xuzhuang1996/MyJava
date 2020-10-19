@@ -38,6 +38,7 @@
     2. edit变量：
     
             groovyScript("def result=''; def params=\"${_1}\".replaceAll('[\\\\[|\\\\]|\\\\s]', '').split(',').toList(); for(i = 0; i < params.size(); i++) {result+=' * @param ' + params[i] + ((i < params.size() - 1) ? '\\n' : '')}; return result", methodParameters())
+1. 直接对比，开分隔窗。window->Editor tab-> split vertical
 ------------------
 ## markdown：
 
