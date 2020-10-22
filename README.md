@@ -117,6 +117,7 @@
 ## maven
 1. 在idea中，maven编译通过，但是idea启动debug失败，即build也不成功。
    - edit debug->bufore launch->删除build->添加maven goal->输入compile。
+2. `mvn install --settings c:\user\settings.xml `,指定maven文件进行打包。
 ## restful
 1. REST相关的概念：资源，集合，URL
    1. 资源：资源是某种东西的对象或表示。例如, 动物，学校和员工是资源; 删除，添加，更新是对这些资源执行的相关操作
