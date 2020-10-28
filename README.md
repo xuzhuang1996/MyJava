@@ -1,7 +1,8 @@
 # MyJava
 你永远不会知道，之前学习的东西，会在未来以什么样的方式运用到。与君共勉
 
-  
+# 好书
+1. [高效java](https://www.bookstack.cn/read/effective-java-3rd-chinese/docs-README.md)
 ## idea:
 
 1. 键入psvm, 也就是public static void main的首字母。然后enter。    
