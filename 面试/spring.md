@@ -74,7 +74,7 @@
         		try {
                  // 初始化DefaultListableBeanFactory，该类基本包含所有BeanFactory的实现
         			DefaultListableBeanFactory beanFactory = createBeanFactory();
-     			// 设置 BeanFactory 的两个配置属性：是否允许 Bean 覆盖、是否允许循环引用
+       			// 设置 BeanFactory 的两个配置属性：是否允许 Bean 覆盖、是否允许循环引用
         			customizeBeanFactory(beanFactory);
                  // 加载 Bean 到 BeanFactory 中。该方法的命名很好，结合了参数。
         			loadBeanDefinitions(beanFactory);
@@ -119,6 +119,7 @@
         ```
    
       - Spring中有很多继承于`aware`中的接口，这些接口是能感知到所有`Aware`前面的含义。通过实现的set方法，保存spring容器相应的引用值，给自己用。
+        
         1. `BeanNameAware`。[来源](https://www.jianshu.com/p/c5c61c31080b)
    
    4. 当前步骤，是提供给子类的扩展点。与步骤5联动。
@@ -170,10 +171,24 @@
    
       4. `getBean`方法。
    
+   ### 1.2 ApplicationContext各个抽象类的关系梳理
    
+   1.  `ApplicationContext`。抽象接口。应该提供以下功能（来自接口文档）：
+      - 访问Bean的能力。继承自`ListableBeanFactory`接口。
+      - 通用的加载资源的能力。继承自`ResourceLoader`接口。
+      - 将事件发布给注册的监听器的能力。继承自`ApplicationEventPublisher`接口。
+      - 解析消息，支持国际化的能力。继承自`MessageSource`接口。
+   2. `ConfigurableApplicationContext`接口。此接口除了继承`ApplicaitnContext`接口的能力外. 还具有可配置上下文与生命周期管理功能。避免暴露给`ApplicaitnContext`，仅在启动与关闭时调用。其中最重要的是定义了`refresh()`方法. `refresh()`功能是加载配置.
+   3. `AbstractApplicationContext`。`ApplicationContext`的抽象实现类，实现了大部分的接口方法。`refresh()`方法的实现为`ApplicationContext`提供了加载配置的能力，包括加载bean。
+   4. `AbstractRefreshableApplicationContext`。继承自`AbstractApplicationContext`。实现了`refreshBeanFactory`方法，完成了对容器底层的beanFactory的刷新。
+   5. `AbstractRefreshableConfigApplicationContext`。用于添加对指定配置位置的通用处理。用作基于XML的应用程序上下文实现。例如`ClassPathXmlApplicationContext`、`FileSystemXmlApplicationContext`。
+   
+   ## bean的生命周期
    
    ## 参考
    
    1. https://blog.csdn.net/nuomizhende45/article/details/81158383
    2. https://www.zybuluo.com/dugu9sword/note/382745
    3. https://blog.csdn.net/caoxiaohong1005/article/details/80039656
+   4. https://www.cnblogs.com/smallstudent/p/11658518.html
+   5. https://www.jianshu.com/p/8aaad9cff96b
