@@ -49,7 +49,7 @@
         	}
         ```
 
-      - 工厂模式。实质是由一个工厂类根据传入的参数，动态决定应该创建哪一个产品类。包括：
+      - 简单工厂。实质是由一个工厂类根据传入的参数，动态决定应该创建哪一个产品类。包括：
 
         1. 各种的Aware接口，比如 `BeanFactoryAware`，对于实现了这些Aware接口的bean，在实例化bean时Spring会帮我们注入对应的`BeanFactory`的实例。
         
@@ -74,7 +74,7 @@
         		try {
                  // 初始化DefaultListableBeanFactory，该类基本包含所有BeanFactory的实现
         			DefaultListableBeanFactory beanFactory = createBeanFactory();
-       			// 设置 BeanFactory 的两个配置属性：是否允许 Bean 覆盖、是否允许循环引用
+      	 			// 设置 BeanFactory 的两个配置属性：是否允许 Bean 覆盖、是否允许循环引用
         			customizeBeanFactory(beanFactory);
                  // 加载 Bean 到 BeanFactory 中。该方法的命名很好，结合了参数。
         			loadBeanDefinitions(beanFactory);
@@ -167,8 +167,40 @@
    
       2. `ConfigurableListableBeanFactory`接口。提供bean definition的解析,注册功能,再对单例来个预加载(解决循环依赖问题)。TODO。
    
-      3. `FactoryBean`。适用于 Bean 的创建过程比较复杂的场景，比如数据库连接池的创建。
+      3. `FactoryBean`接口。当bean实现了`FactoryBean`接口，spring会在使用`getBean()`调用获得该bean时，自动调用该bean的`getObject()`方法，所以**返回的不是factory这个bean，而是这个`bean.getOjbect()`方法的返回值。**适用于 Bean 的创建过程比较复杂的场景，比如数据库连接池的创建。
    
+         - 工厂方法。例子：spring与mybatis的结合。由于实现了`FactoryBean`接口，所以返回的不是 `SqlSessionFactoryBean`的实例，而是她的 `SqlSessionFactoryBean.getObject()` 的返回值。
+      
+           ```java
+           <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+           	<property name="dataSource" ref="dataSource" />
+           	<property name="mapperLocations" value="classpath:mybatis-mapper/*.xml"/>
+           </bean>
+           ```
+      
+         - 单例模式。这里只是顺带提一嘴。从效率角度考虑，使用temp临时变量，是因为这里临时变量从工作内存中读取，效率更高；而volatile变量从主存中读取，效率更低。使用后，可以减少读取主存的次数。
+      
+           ```java
+           public class SingleTon3 {
+                    private SingleTon3(){};             //私有化构造方法
+           
+                    private static volatile SingleTon3 singleTon = null;
+           
+                    public static SingleTon3 getInstance() {
+                            SingleTon3 temp = singleTon;
+                             //第一次校验
+                            if(temp==null){     
+                           	synchronized(SingleTon3.class){
+                                   //第二次校验
+                                   if(temp==null){     
+                                    	singleTon=new SingleTon3();
+                                   }
+                             }
+                	  }
+                	 return temp;
+           }
+           ```
+      
       4. `getBean`方法。
    
    ### 1.2 ApplicationContext各个抽象类的关系梳理
@@ -182,6 +214,11 @@
    3. `AbstractApplicationContext`。`ApplicationContext`的抽象实现类，实现了大部分的接口方法。`refresh()`方法的实现为`ApplicationContext`提供了加载配置的能力，包括加载bean。
    4. `AbstractRefreshableApplicationContext`。继承自`AbstractApplicationContext`。实现了`refreshBeanFactory`方法，完成了对容器底层的beanFactory的刷新。
    5. `AbstractRefreshableConfigApplicationContext`。用于添加对指定配置位置的通用处理。用作基于XML的应用程序上下文实现。例如`ClassPathXmlApplicationContext`、`FileSystemXmlApplicationContext`。
+   
+   ## 设计模式，这节会删，并到上面的流程中
+   
+   1. 装饰器模式。Spring中用到的包装器模式在类名上有两种表现：一种是类名中含有Wrapper，另一种是类名中含有Decorator。动态地给一个对象添加一些额外的职责。就增加功能来说，Decorator模式相比生成子类更为灵活。
+   2. 代理模式。动态代理：在内存中构建的，不需要手动编写代理类。静态代理：需要手工编写代理类，代理类引用被代理对象。
    
    ## bean的生命周期
    
