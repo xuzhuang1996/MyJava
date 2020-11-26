@@ -219,3 +219,5 @@
       - 第一个ALL表示允许使用sudo的主机；（可以是localhost或者啥）
       - 第二个ALL及第三个ALL表示以什么身份去执行（这里以ALL身份执行）；
       - 第四个ALL表示sudo可执行的命令，即所有命令；在有的系统中也简写做：`root ALL=(ALL) ALL`
+## sh
+1. 远程执行命令：ssh root@127.0.0.1 "chown ossadm:ossgroup /opt/pub/software"
