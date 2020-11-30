@@ -100,6 +100,63 @@
         	}
         ```
    
+      - 模板方法3。模板方法模式和回调模式的结合，是Template Method不需要继承的一种实现方式。例如，JDBC的抽象和对Hibernate的集成，都采用了一种理念或者处理方式。[JdbcTemplate](https://blog.csdn.net/weixin_40001125/article/details/88538576)
+   
+        ```java
+        // 采用模板方法模式是为了以一种统一而集中的方式来处理资源的获取和释放
+        // JdbcTemplate是抽象类，不能够独立使用，我们每次进行数据访问的时候都要给出一个相应的子类实现,这样肯定不方便，所以就引入了回调 。
+        public class JdbcTemplate {  
+            public final Object execute（StatementCallback callback）{  
+                Connection con=null;  
+                Statement stmt=null;  
+                try{  
+                    con=getConnection（）;  
+                    stmt=con.createStatement（）;  
+                    // 回调，callback类型为StatementCallback
+                    Object retValue=callback.doWithStatement(stmt);  
+                    return retValue;  
+                }catch（SQLException e）{  
+                    ...  
+                }finally{  
+                    closeStatement（stmt）;  
+                    releaseConnection（con）;  
+                }  
+            }  
+        
+            ...//其它方法定义  
+        }   
+        
+        // 回调接口定义
+        public interface StatementCallback{  
+            Object doWithStatement（Statement stmt）;  
+        }
+        
+        // 使用方法1。采用匿名类的方式，或者如果只有一个抽象方法，可以使用lambda表示式，如Runnable
+        JdbcTemplate jdbcTemplate;  
+        final String sql;  
+        StatementCallback callback = new StatementCallback() {  
+        	public Object doWithStatement(Statement stmt){  
+                return ...;  
+            }  
+        }    
+        jdbcTemplate.execute(callback);
+        
+        // 使用方法2
+        public void test() {
+                String sql = "insert into test(name) values (?)";
+                //返回的是更新的行数
+                int count = jdbcTemplate.update(sql, new PreparedStatementSetter(){
+                    @Override
+                    public void setValues(PreparedStatement pstmt)
+                            throws SQLException {
+                        pstmt.setObject(1, "name4"); 
+                    }
+                });
+        }
+        ```
+   
+        
+   
    3. 设置 `BeanFactory` 的类加载器，添加几个`BeanPostProcessor`，手动注册几个特殊的 bean。
    
       ```java
@@ -170,16 +227,16 @@
       3. `FactoryBean`接口。当bean实现了`FactoryBean`接口，spring会在使用`getBean()`调用获得该bean时，自动调用该bean的`getObject()`方法，所以**返回的不是factory这个bean，而是这个`bean.getOjbect()`方法的返回值。**适用于 Bean 的创建过程比较复杂的场景，比如数据库连接池的创建。
    
          - 工厂方法。例子：spring与mybatis的结合。由于实现了`FactoryBean`接口，所以返回的不是 `SqlSessionFactoryBean`的实例，而是她的 `SqlSessionFactoryBean.getObject()` 的返回值。这样就相当于将自己注册到了spring容器中，sqlSessionFactory存储的是具体的bean。
-      
+   
            ```java
            <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
            	<property name="dataSource" ref="dataSource" />
            	<property name="mapperLocations" value="classpath:mybatis-mapper/*.xml"/>
            </bean>
            ```
-      
+   
          - 单例模式。这里只是顺带提一嘴。从效率角度考虑，使用temp临时变量，是因为这里临时变量从工作内存中读取，效率更高；而volatile变量从主存中读取，效率更低。使用后，可以减少读取主存的次数。
-      
+   
            ```java
            public class SingleTon3 {
                     private SingleTon3(){};             //私有化构造方法
@@ -200,7 +257,7 @@
                 	 return temp;
            }
            ```
-      
+   
       4. `getBean`方法。
    
    ### 1.2 ApplicationContext各个抽象类的关系梳理
