@@ -169,7 +169,7 @@
    
       3. `FactoryBean`接口。当bean实现了`FactoryBean`接口，spring会在使用`getBean()`调用获得该bean时，自动调用该bean的`getObject()`方法，所以**返回的不是factory这个bean，而是这个`bean.getOjbect()`方法的返回值。**适用于 Bean 的创建过程比较复杂的场景，比如数据库连接池的创建。
    
-         - 工厂方法。例子：spring与mybatis的结合。由于实现了`FactoryBean`接口，所以返回的不是 `SqlSessionFactoryBean`的实例，而是她的 `SqlSessionFactoryBean.getObject()` 的返回值。
+         - 工厂方法。例子：spring与mybatis的结合。由于实现了`FactoryBean`接口，所以返回的不是 `SqlSessionFactoryBean`的实例，而是她的 `SqlSessionFactoryBean.getObject()` 的返回值。这样就相当于将自己注册到了spring容器中，sqlSessionFactory存储的是具体的bean。
       
            ```java
            <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -207,7 +207,10 @@
    
    1.  `ApplicationContext`。抽象接口。应该提供以下功能（来自接口文档）：
       - 访问Bean的能力。继承自`ListableBeanFactory`接口。
+        1. 上图可以看出，该接口继承自`beanFactory`接口。对于`AbstractApplicationContext`而言，它将在自己类里实现`ListableBeanFactory`与`beanFactory`接口的抽象方法。
+        2. 该接口功能是：[根据类型获取bean](https://blog.csdn.net/u013412772/article/details/80819314)。**该接口定义了访问容器中Bean基本信息的若干方法，如查看Bean的个数、获取某一类型Bean的配置名（Autowire注解的List注入功能实现）、查看容器中是否包括某一Bean等方法。**不再需要一个个bean地查找，提供容器中bean迭代的功能。在看SpringMVC时,扫描包路径下的具体实现策略就是使用的这种方式(那边使用的是`BeanFactoryUtils`封装的api)。// TODO
       - 通用的加载资源的能力。继承自`ResourceLoader`接口。
+        1. `实现接口`的隔离：对于`AbstractApplicationContext`而言，尽管它继承了`ResourceLoader`接口的抽象方法，但是它只需要在继承`ResourceLoader`接口的实现类`DefaultResourceLoader`，就能够拥有该类的能力。常规思路是自己去实现`ResourceLoader`接口的抽象方法。不过该方式对于单继承的Java有点尴尬。用法不常见。
       - 将事件发布给注册的监听器的能力。继承自`ApplicationEventPublisher`接口。
       - 解析消息，支持国际化的能力。继承自`MessageSource`接口。
    2. `ConfigurableApplicationContext`接口。此接口除了继承`ApplicaitnContext`接口的能力外. 还具有可配置上下文与生命周期管理功能。避免暴露给`ApplicaitnContext`，仅在启动与关闭时调用。其中最重要的是定义了`refresh()`方法. `refresh()`功能是加载配置.
