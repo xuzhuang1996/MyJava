@@ -282,6 +282,98 @@
    
    ## bean的生命周期
    
+   ## spring aop调用链
+   
+   1. 入口：`JdkDynamicAopProxy`的invoke方法
+   
+      ```java
+      // Get the interception chain for this method.
+      List<Object> chain = this.advised.getInterceptorsAndDynamicInterceptionAdvice(method, targetClass);
+      ```
+   
+   2. `DefaultAdvisorChainFactory.getInterceptorsAndDynamicInterceptionAdvice`方法中，核心逻辑：
+   
+      ```java
+      // 把Advisor转换成MethodInterceptor
+      MethodInterceptor[] interceptors = registry.getInterceptors(advisor);
+      ```
+   
+   3. `DefaultAdvisorAdapterRegistry`类的实现
+   
+      ```java
+      	public MethodInterceptor[] getInterceptors(Advisor advisor)  {
+      		List<MethodInterceptor> interceptors = new ArrayList<>(3);
+      		Advice advice = advisor.getAdvice();
+              // 通知本身就是MethodInterceptor对象，就不需要再转换。包括AspectJAfterAdvice、AspectJAfterThrowingAdvice、AspectJAroundAdvice等接口
+      		if (advice instanceof MethodInterceptor) {
+      			interceptors.add((MethodInterceptor) advice);
+      		}
+              // 如果通知不是MethodInterceptor对象对象，使用适配器转换。这里的supportsAdvice跟springMVC的查找适配器方法一致。adapters包含三种适配器：MethodBeforeAdviceAdapter、AfterReturningAdviceAdapter、ThrowsAdviceAdapter。
+      		for (AdvisorAdapter adapter : this.adapters) {
+      			if (adapter.supportsAdvice(advice)) {
+                      // 适配器使用方法：get方法
+      				interceptors.add(adapter.getInterceptor(advisor));
+      			}
+      		}
+      		if (interceptors.isEmpty()) {
+      			throw new UnknownAdviceTypeException(advisor.getAdvice());
+      		}
+      		return interceptors.toArray(new MethodInterceptor[0]);
+      	}
+      ```
+   
+   4. 继承关系
+   
+      ![img](https://upload-images.jianshu.io/upload_images/10236819-f5cd79e1bc43f43d.png?imageMogr2/auto-orient/strip|imageView2/2/w/1140/format/webp)
+   
+   5. 把拦截器生成MethodInterceptor拦截器链后，重新回到`JdkDynamicAopProxy`的invoke方法，基于生成的chain，去调用链：
+   
+      ```java
+      		// We need to create a method invocation...
+      		MethodInvocation invocation = new ReflectiveMethodInvocation(proxy, target, method, args, targetClass, chain);
+      		// Proceed to the joinpoint through the interceptor chain.这里的proceed是Joinpoint接口的方法。有2个实现类：CglibAopProxy、ReflectiveMethodInvocation
+      		retVal = invocation.proceed();
+      ```
+   
+   6. 调用链。`ReflectiveMethodInvocation`的主要职责是维护了链接调用的计数器，记录着当前调用链接的位置，以便链接可以有序地进行下去。因此在proceed方法中并没有维护调用链的顺序，而是将此工作委拖给各个增强器，在各个增强器的内部进行逻辑实现。TODO：子类如何实现顺序调用
+   
+      ```java
+      	public Object proceed() throws Throwable {
+      		// We start with an index of -1 and increment early.
+              // 拦截器链全部调用完，即下标满格时，再调用目标方法
+      		if (this.currentInterceptorIndex == this.interceptorsAndDynamicMethodMatchers.size() - 1) {
+      			return invokeJoinpoint();
+      		}
+              // 增加计数器，得到下一个通知或者拦截器
+      		Object interceptorOrInterceptionAdvice = this.interceptorsAndDynamicMethodMatchers.get(++this.currentInterceptorIndex);
+      		if (interceptorOrInterceptionAdvice instanceof InterceptorAndDynamicMethodMatcher) {
+      			// Evaluate dynamic method matcher here: static part will already have
+      			// been evaluated and found to match.
+      			InterceptorAndDynamicMethodMatcher dm =
+      					(InterceptorAndDynamicMethodMatcher) interceptorOrInterceptionAdvice;
+      			Class<?> targetClass = (this.targetClass != null ? this.targetClass : this.method.getDeclaringClass());
+      			if (dm.methodMatcher.matches(this.method, targetClass, this.arguments)) {
+      				return dm.interceptor.invoke(this);
+      			}
+      			else {
+      				// Dynamic matching failed.
+      				// Skip this interceptor and invoke the next in the chain.
+      				return proceed();
+      			}
+      		}
+      		else {
+      			// It's an interceptor, so we just invoke it: The pointcut will have
+      			// been evaluated statically before this object was constructed.
+                  // 如果只是一个拦截器，直接调用拦截器中方法
+      			return ((MethodInterceptor) interceptorOrInterceptionAdvice).invoke(this);
+      		}
+      	}
+      ```
+   
+   7. 调用过程：
+   
+      ![img](https://upload-images.jianshu.io/upload_images/10236819-4535ec062f655d39.png?imageMogr2/auto-orient/strip|imageView2/2/w/439/format/webp)
+   
    ## 参考
    
    1. https://blog.csdn.net/nuomizhende45/article/details/81158383
@@ -289,3 +381,4 @@
    3. https://blog.csdn.net/caoxiaohong1005/article/details/80039656
    4. https://www.cnblogs.com/smallstudent/p/11658518.html
    5. https://www.jianshu.com/p/8aaad9cff96b
+   6. [spring aop 调用链](https://www.jianshu.com/p/f37148c845a9)
