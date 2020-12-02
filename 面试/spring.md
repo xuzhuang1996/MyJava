@@ -222,7 +222,7 @@
         }
         ```
    
-      - 在创建bean的过程中，遍历所有的`beanPostProcessors`，从而调用相关方法。
+      - 在创建bean的过程中，遍历所有的`beanPostProcessors`，从而调用相关方法。具体可以研究下面的`getBean`方法。
    
    7. 注册事件监听器，监听器需要实现` ApplicationListener` 接口。
    
