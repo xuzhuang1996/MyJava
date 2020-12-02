@@ -193,7 +193,7 @@
       invokeBeanFactoryPostProcessors(beanFactory);
       ```
    
-   6. 将所有实现`BeanPostProcessor`接口的bean注册到`BeanFactory` 维护的 `BeanPostProcessor` 列表。
+   6. 将所有实现`BeanPostProcessor`接口的bean注册到`BeanFactory` 维护的 `BeanPostProcessor` 列表`beanPostProcessors`中。
    
       > `BeanPostProcessor`接口两个方法: `postProcessBeforeInitialization `和 `postProcessAfterInitialization`。两个方法分别在 Bean 初始化之前和初始化之后得到执行。
    
@@ -201,7 +201,30 @@
       registerBeanPostProcessors(beanFactory);
       ```
    
-   7. 注册事件监听器，监听器需要实现 ApplicationListener 接口。
+      - `BeanPostProcessor`接口可以对bean实例做一些自定义修改，包括下面两种方法。使用方式如下。
+   
+        ```java
+        @Component
+        public class MyBeanPostProcessor implements BeanPostProcessor {
+            // bean在初始化之前需要调用的方法
+            @Override
+            public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+                System.out.println(beanName + " MyBeanPostProcessor#MyBeanPostProcessor");
+                return bean;
+            }
+        
+            // bean在初始化之后需要调用的方法
+            @Override
+            public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+                System.out.println(beanName + " MyBeanPostProcessor#postProcessAfterInitialization");
+                return bean;
+            }
+        }
+        ```
+   
+      - 在创建bean的过程中，遍历所有的`beanPostProcessors`，从而调用相关方法。
+   
+   7. 注册事件监听器，监听器需要实现` ApplicationListener` 接口。
    
       ```java
       registerListeners();
