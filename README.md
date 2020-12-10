@@ -82,7 +82,8 @@
 9. `git clone -b dev_jk http://10.1.1.11/service/tmall-service.git`指定分支下载
 10. `git cherry-pick`命令的作用，就是将指定的提交（commit）应用于当前分支。
 11. `git status`三个区（工作区、暂存区、存储区）的区别，`git diff`默认暂存区与工作区的区别。
-12. git merge branchname合并到当前分支
+12. `git merge branch name`合并到当前分支
+13. `git pull <远程库名> <远程分支名>:<本地分支名>`从远程库中获取某个分支的更新，再与本地指定的分支进行自动merge。`git pull origin develop`如果是要与本地当前分支merge，则冒号后面的<本地分支名>可以不写.
 ------------
 ## mysql
 1. Ubuntu下sudo能无密码访问，但是普通用户无法登录。这样就可以密码登录
