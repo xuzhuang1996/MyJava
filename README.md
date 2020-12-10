@@ -40,6 +40,7 @@
     
             groovyScript("def result=''; def params=\"${_1}\".replaceAll('[\\\\[|\\\\]|\\\\s]', '').split(',').toList(); for(i = 0; i < params.size(); i++) {result+=' * @param ' + params[i] + ((i < params.size() - 1) ? '\\n' : '')}; return result", methodParameters())
 1. 直接对比，开分隔窗。window->Editor tab-> split vertical
+1. intellij IDEA Properties中文unicode自动转码处理:File | Settings | Editor | File Encoding 下，勾选Transparent native-to-ascii conversion,UTF-8.适用：IDEA Properties文件常用于存储国际化内容，为避免编码差异，文件的中文通常要进行unicode编码。
 ------------------
 ## markdown：
 
