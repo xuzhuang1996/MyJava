@@ -12,8 +12,8 @@
 
 1. @Autowired注解作用在方法上。
 
-   1. 该方法如果有参数，会使用autowired的方式在容器中查找是否有该参数
-   2. 会执行该方法。
+   1. 该方法如果有参数，会使用autowired的方式在spring容器中查找是否有该参数。
+   2. 会执行该方法。因此，这个注解比较适合注册机制。目前看来更适合用于构造函数问题。
 
 2. 作用在构造器上。底层注入流程就相当于是使用构造函数进行依赖注入了。
 
@@ -25,7 +25,7 @@
    @RestController
    @RequestMapping("/user")
    public class UserController {
-       // 这里不加Autowired也可以成功注入。
+       // 这里不加Autowired也可以成功注入。其实是通过构造函数进行的设置注入。
        private final UserService userService;
    
        @Autowired
@@ -113,6 +113,7 @@
 ### 组合优于继承
 
 1. 父类的实现可能会从发布版本不断变化，如果是这样，子类可能会被破坏，即使它的代码没有任何改变。 因此，一个子类必须与其超类一起更新而变化.
+2. 存在继承的情况下，方法向超类方向集中，数据向子类方向集中
 
 ### 接口优于抽象类
 
@@ -122,6 +123,30 @@
 
 1. 当类实现接口时，该接口作为一种类型（type），可以用来引用类的实例。因此，一个类实现了一个接口，因此表明客户端可以如何处理类的实例。**为其他目的定义接口是不合适的**。
 
+## 架构
+
+### 包结构
+
+1. model层，分层领域模型。
+2. helper层，用于提供底层的业务计算逻辑。Helper 依赖于特定的领域，即特定的业务。service里的每个方法只完成一个业务逻辑，如果业务逻辑比较复杂，可以考虑拆分成一个helper或者manager来专门处理这个复杂的逻辑，service就清清爽爽了，而不用一大堆的private方法在service里了。
+3. 通用工具层与业务无关，任何系统，只要有需要都可以引用。
+   1. 常量：分为属性名常量类、状态值常量类、普通字符串常量。
+4. 
+
+## 小工具
+
+1. 界面输入密码繁琐。然后将其粘贴到书签栏，形成一个书签。
+
+   ```javascript
+   javascript:$('#name').val('admin');
+   $('#pwd').val('123456');
+   $('#submitDataverify').click();
+   ```
+
+2. 
+
 ## 参考
 
 1. https://www.bookstack.cn/read/effective-java-3rd-chinese/docs-README.md
+2. [郑教练博客](http://arganzheng.life/)
+3. [分布式锁AOP](https://developer.ibm.com/zh/languages/spring/articles/j-spring-boot-aop-web-log-processing-and-distributed-locking/)
