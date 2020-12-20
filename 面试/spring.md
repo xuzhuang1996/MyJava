@@ -236,7 +236,7 @@
       finishBeanFactoryInitialization(beanFactory);
       ```
    
-      1. 该步骤部分代码：
+      1. 该步骤部分代码。该方法中，首先判断是否为FactoryBean，该接口的子类name需要加上`&`，即最终存在IOC容器中的name。否则调用`getBean()`方法进行初始化。
    
          ```java
          	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
@@ -245,21 +245,25 @@
          	}
          ```
    
-      2. `ConfigurableListableBeanFactory`接口。提供bean definition的解析,注册功能,再对单例来个预加载(解决循环依赖问题)。TODO。
+      2. TODO
    
-      3. `FactoryBean`接口。当bean实现了`FactoryBean`接口，spring会在使用`getBean()`调用获得该bean时，自动调用该bean的`getObject()`方法，所以**返回的不是factory这个bean，而是这个`bean.getOjbect()`方法的返回值。**适用于 Bean 的创建过程比较复杂的场景，比如数据库连接池的创建。
+      3. 在调用`getBean()`初始化后，通过`getSingleton(beanName)`从IOC容器取出对象。
    
+      4. ConfigurableListableBeanFactory`接口。提供bean definition的解析,注册功能,再对单例来个预加载(解决循环依赖问题)。TODO。
+   
+      5. `FactoryBean`接口。当bean实现了`FactoryBean`接口，spring会在使用`getBean()`调用获得该bean时，自动调用该bean的`getObject()`方法，所以**返回的不是factory这个bean，而是这个`bean.getOjbect()`方法的返回值。**适用于 Bean 的创建过程比较复杂的场景，比如数据库连接池的创建。
+      
          - 工厂方法。例子：spring与mybatis的结合。由于实现了`FactoryBean`接口，所以返回的不是 `SqlSessionFactoryBean`的实例，而是她的 `SqlSessionFactoryBean.getObject()` 的返回值。这样就相当于将自己注册到了spring容器中，sqlSessionFactory存储的是具体的bean。
-   
+      
            ```java
            <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-           	<property name="dataSource" ref="dataSource" />
+        	<property name="dataSource" ref="dataSource" />
            	<property name="mapperLocations" value="classpath:mybatis-mapper/*.xml"/>
-           </bean>
+        </bean>
            ```
-   
+      
          - 单例模式。这里只是顺带提一嘴。从效率角度考虑，使用temp临时变量，是因为这里临时变量从工作内存中读取，效率更高；而volatile变量从主存中读取，效率更低。使用后，可以减少读取主存的次数。
-   
+      
            ```java
            public class SingleTon3 {
                     private SingleTon3(){};             //私有化构造方法
@@ -276,12 +280,12 @@
                                     	singleTon=new SingleTon3();
                                    }
                              }
-                	  }
+             	  }
                 	 return temp;
            }
            ```
-   
-      4. `getBean`方法。
+      
+      6. `getBean`方法。
    
    ### 1.2 ApplicationContext各个抽象类的关系梳理
    
@@ -405,3 +409,4 @@
    4. https://www.cnblogs.com/smallstudent/p/11658518.html
    5. https://www.jianshu.com/p/8aaad9cff96b
    6. [spring aop 调用链](https://www.jianshu.com/p/f37148c845a9)
+   7. [getBean](https://www.cnblogs.com/toby-xu/p/11333479.html)
