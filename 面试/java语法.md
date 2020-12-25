@@ -44,11 +44,9 @@
    }
    ```
 
-## git
+6. [Bean注解](http://arganzheng.life/spring-java-based-configuration.html)。方法注解，该工厂方法返回的对象将被Spring托管。优势：在运行时期根据一些信息返回不同的bean实例（策略模式）。
 
-1. 比较当前分支，自己的修改与之前commit版本的区别
-
-   ![1603529576323](C:\Users\x00574457\AppData\Local\Temp\1603529576323.png)
+7. 匿名类：如果某个步骤依赖某个操作，该操作只使用一次，为了避免采用注入方式进行依赖。可以采用匿名内部类。
 
 ## 异常
 
