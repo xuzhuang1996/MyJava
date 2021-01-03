@@ -1,8 +1,6 @@
 # MyJava
-你永远不会知道，之前学习的东西，会在未来以什么样的方式运用到。与君共勉
+你永远不会知道，之前学习的东西，会在未来以什么样的方式运用到。与君共勉。
 
-# 好书
-1. [高效java](https://www.bookstack.cn/read/effective-java-3rd-chinese/docs-README.md)
 ## idea:
 
 1. 键入psvm, 也就是public static void main的首字母。然后enter。    
@@ -25,44 +23,11 @@
    1. ctrl + alt + M 抽方法。
    2. Ctrl + Alt + T将属性抽出参数。
    1. Ctrl+shift+Alt+T，抽类，选择delegate
+   5. ctrl+alt+V，抽变量表达式，定义变量。Predicate这种变量很适合。
 1. 比较同一个文件，在两个分支的区别：VCS->Git->Compare with Branch
 1. 比较两个文件不同处：复制一个文件，全选。在另一个文件中右键，选择compare with clipBroad
-1. 方法注释：
-   1. 方法注释头：
-   
-           **
-           * @Description
-           *   
-          $param$
-           * @return 
-           **/
-    2. edit变量：
-    
-            groovyScript("def result=''; def params=\"${_1}\".replaceAll('[\\\\[|\\\\]|\\\\s]', '').split(',').toList(); for(i = 0; i < params.size(); i++) {result+=' * @param ' + params[i] + ((i < params.size() - 1) ? '\\n' : '')}; return result", methodParameters())
 1. 直接对比，开分隔窗。window->Editor tab-> split vertical
 1. intellij IDEA Properties中文unicode自动转码处理:File | Settings | Editor | File Encoding 下，勾选Transparent native-to-ascii conversion,UTF-8.适用：IDEA Properties文件常用于存储国际化内容，为避免编码差异，文件的中文通常要进行unicode编码。
-1. ctrl+alt+V，抽变量表达式，定义变量。Predicate
-------------------
-## markdown：
-
-1. 图片添加：
-    - `<img src="https..." width = 30% height = 30% />`
-    - `<div align=center>![这里写图片描述](http:...)`
-    - `<img src="https://github.com/xuzhuang1996/MyJava/blob/master/img/面试/1-B+树插入过程.gif" width=50% height=50% />`
-
--------------
-## java
-1. 正则表达式过滤出字母、数字和中文
-   - 过滤出字母: `[^(A-Za-z)]`
-   - 过滤出数字: `[^(0-9)]`
-   - 过滤出中文: `[^(\\u4e00-\\u9fa5)]`,不过直接复制这个到idea会自动补/，因此记住这里只有2个/
-   - 过滤字母数字：`s.replaceAll("[^A-Za-z0-9]", ""); `
-   
-2. [通配符和边界](https://www.cnblogs.com/drizzlewithwind/p/6100164.html)来源。
-   - `<? extends T>`,上界通配符。能放一切继承自T的类.频繁往外读取内容的,适合用<? extends T >。
-   - `<? super T>`,下界通配符。能放T及T继承的类，但不能放T的派生类。经常往里插入的,适合用 <? super T> 。
-   
-
 ----------
 ## git
 1. `git remote update origin --prune`   # 更新远程主机origin 整理分支
@@ -86,60 +51,8 @@
 11. `git status`三个区（工作区、暂存区、存储区）的区别，`git diff`默认暂存区与工作区的区别。
 12. `git merge branch name`合并到当前分支
 13. `git pull <远程库名> <远程分支名>:<本地分支名>`从远程库中获取某个分支的更新，再与本地指定的分支进行自动merge。`git pull origin develop`如果是要与本地当前分支merge，则冒号后面的<本地分支名>可以不写.
-------------
-## mysql
-1. Ubuntu下sudo能无密码访问，但是普通用户无法登录。这样就可以密码登录
-   - update mysql.user set authentication_string=PASSWORD('12345678'), plugin='mysql_native_password' where user='root';
-   - flush privileges;
-   
-   
-   
---------------------
-## pom
-1. [jar打包依赖](https://www.ibm.com/developerworks/cn/java/j-5things13/index.html)。springboot
-
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <!-- 告知 maven-jar-plugin 添加一个 Class-Path 元素到 MANIFEST.MF 文件 -->
-                    <!--<addClasspath>true</addClasspath>-->
-                    <!-- 如果您计划在同一目录下包含有您的所有依赖项，作为您将构建的 JAR，那么您可以忽略它，否则所有的依赖项应该位于 “lib” 文件夹-->
-                    <!--<classpathPrefix>lib/</classpathPrefix>-->
-                    <!-- 指定该Main Class为全局的唯一入口 -->
-                    <mainClass>com.example.demo.DemoApplication</mainClass>
-                    <layout>ZIP</layout>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal><!--可以把依赖的包都打包到生成的Jar包中-->
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
 ## maven
 1. 在idea中，maven编译通过，但是idea启动debug失败，即build也不成功。
    - edit debug->bufore launch->删除build->添加maven goal->输入compile。
 2. `mvn install --settings c:\user\settings.xml `,指定maven文件进行打包。
-## restful
-1. REST相关的概念：资源，集合，URL
-   1. 资源：资源是某种东西的对象或表示。例如, 动物，学校和员工是资源; 删除，添加，更新是对这些资源执行的相关操作
-   2. 集合：资源集合，例如，公司是资源的集合
-   3. URL: 可以通过其定位资源的路径，并且可以对其执行某些操作
-2. URL设计：
-   1. 动词
-      - POST：新建（Create）
-      - GET：读取（Read）
-      - PUT：更新（Update）
-      - PATCH：更新（Update），通常不分更新，也很少用到
-      - DELETE：删除（Delete）
-   2. 名词设计，表示一个资源或者服务，用名词复数的形式描述某一资源
-3. RESTful 幂等性（多次调用是否会对资源产生影响）原则
-http://www.yymp3.com/Play/12813/163839.htm
-
-1. tmp
-   - https://potoyang.gitbook.io/spring-in-action-v5/di-11-zhang-kai-fa-xiang-ying-shi-api/11.1-shi-yong-spring-webflux
-   - https://developer.ibm.com/zh/depmodels/reactive-systems/tutorials/j-whats-new-in-spring-framework-5-theedom/
-   - https://developer.ibm.com/zh/depmodels/reactive-systems/articles/spring5-webflux-reactive/
 
