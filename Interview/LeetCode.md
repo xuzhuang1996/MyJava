@@ -28,7 +28,7 @@
    
 4. BFS。BFS + Queue。记录level。模板。这里的visited可以用set存储。[常见题](https://leetcode-cn.com/problems/open-the-lock/)。与DFS不同，BFS适用于求level，即次数、圈数等层次关系。
 
-		```
+	```
 	while(q not empty){
 		    int sz=q.size();
 		    /*将当前队列中的所有节点向四周扩散*/ 即需要一个初始的种子，种入对列中
@@ -51,7 +51,7 @@
 	
 5. DFS。DFS + Stack。[常见题](https://leetcode-cn.com/problems/reconstruct-itinerary/)。另外，对于BFS以及DFS的种子问题，如果是二位数组，可以考虑数据结构一次性加两个数字。简化操作。
 
-6. 回溯，DFS的一种。
+6. [回溯](https://labuladong.gitbook.io/algo/)，DFS的一种。
 
     ```
     result = []
