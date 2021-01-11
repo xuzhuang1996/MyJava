@@ -302,7 +302,32 @@ finishBeanFactoryInitialization(beanFactory);
      }
      ```
 
-##### getBean方法梳理
+##### [getBean方法梳理](https://www.cnblogs.com/cxyAtuo/p/11626648.html)
+
+1. 计算所给name对应的内部beanName 。
+
+2. 尝试获取bean实例 。
+
+3. 启用双亲委托机制。 如果存在父容器，且父容器存在该beanName的定义，则委托给父容器完成。 
+
+4. 获取该beanName对应的BeanDefinition,包装为RootBeanDefinition返回。 
+
+   >  AbstractBeanFactory内部维护了一个Map<String, RootBeanDefinition>集合mergedBeanDefinitions，用于维护当前已经加载的各个bean定义bd。在加载该bean定义时，如果存在父定义pdb，则会将pdb包装为一个RootBeanDefinition，然后将当前的bd覆盖掉父定义的内容，包括scope、lazyInit、dependsOn等属性，达到继承的效果。获得RootBeanDefinition后，如果最后的定义中scope为空，则会默认赋值为single。 
+
+5. 处理依赖的bean。 获取该bean依赖的bean列表dependsOn值，对每个依赖的bean进行逐一操作，先检查该bean是否存在循环依赖。
+
+   1. 若不存在循环依赖，则将依赖关系缓存起来，最后先实例化依赖的bean。
+
+   2. 如果存在循环依赖，为了防止死循环。AbstractBeanFacotry内部维护了两个`Map<String, Set<String>>`属性dependentBeanMap和dependenciesForBeanMap，分别用于缓存bean的依赖关系。
+
+      - dependentBeanMap表示bean从属关系的缓存，缓存依赖于key所表示的bean的所有bean name。举例来讲，如果beanB的一个属性是beanA,则beanA为key是被依赖方，beanB则为value是依赖方(从属方)的一员；
+      - dependenciesForBeanMap表示bean依赖关系的缓存，缓存key所表示的bean依赖的所有bean name,举例来讲，如果beanB的一个属性是beanA,则beanB是key从属方，beanA则是value被依赖方的一员。
+
+   3. 检查循环依赖。 其中beanName为当前bean,dependentBeanName为当前bean所依赖的bean。 dependentBeans 存储着所有依赖于当前 beanName 的bean，遍历dependentBeans ，如果存在环（A依赖B，B依赖C，C依赖A），表示存在循环依赖。
+
+      ![1610381167734](.assets/1610381167734.png)
+
+6.  如果该bean为单例，则转入初始化单例流程 。
 
 ##### 循环依赖处理
 
@@ -313,13 +338,13 @@ finishBeanFactoryInitialization(beanFactory);
 3. 三级缓存。
 
    ```java
-   		/** 一级缓存：用于存放完全初始化好的 bean **/
+   		/** 一级缓存，单例对象的 cache：用于存放完全初始化好的 bean **/
    		private final Map<String, Object> singletonObjects = new ConcurrentHashMap<String, Object>(256);
    
-   		/** 二级缓存：存放原始的 bean 对象（尚未填充属性），用于解决循环依赖 */
+   		/** 二级缓存，提前曝光的单例对象cache：存放原始的bean对象（尚未填充属性），解决循环依赖 */
    		private final Map<String, Object> earlySingletonObjects = new HashMap<String, Object>(16);
    		
-   		/** 三级级缓存：存放 bean 工厂对象，用于解决循环依赖 */
+   		/** 三级级缓存，单例对象工厂的cache：存放 bean 工厂对象，解决循环依赖 */
    		private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<String, ObjectFactory<?>>(16);
    ```
 
@@ -626,7 +651,7 @@ spring实现的技术为： JDK提供的动态代理技术 和 CGLIB(动态字�
 2. Autowired、Resource两者区别：一旦涉及到泛型。如T为beanA，Autowired将根据`IUserService<beanA>`注入，而Resource将根据`IUserService<T>`进行注入。如果此时有2个以上的`IUserService<T>`类型，虽然T不一样，但是依然会产生冲突，报错。
 
    ```java
-   @Autowired   
+      @Autowired   
       public IUserService<T> userService; 
       @Resource   
       public IUserService<T> userService; 
