@@ -320,8 +320,8 @@ finishBeanFactoryInitialization(beanFactory);
 
    2. 如果存在循环依赖，为了防止死循环。AbstractBeanFacotry内部维护了两个`Map<String, Set<String>>`属性dependentBeanMap和dependenciesForBeanMap，分别用于缓存bean的依赖关系。
 
-      - dependentBeanMap表示bean从属关系的缓存，缓存依赖于key所表示的bean的所有bean name。举例来讲，如果beanB的一个属性是beanA,则beanA为key是被依赖方，beanB则为value是依赖方(从属方)的一员；
-      - dependenciesForBeanMap表示bean依赖关系的缓存，缓存key所表示的bean依赖的所有bean name,举例来讲，如果beanB的一个属性是beanA,则beanB是key从属方，beanA则是value被依赖方的一员。
+      - dependentBeanMap,bean名称和所有依赖于该bean的名称的集合。
+      - dependenciesForBeanMap,bean名称和bean所依赖的所有名称的集合。与dependentBeanMap相反。
 
    3. 检查循环依赖。 其中beanName为当前bean,dependentBeanName为当前bean所依赖的bean。 dependentBeans 存储着所有依赖于当前 beanName 的bean，遍历dependentBeans ，如果存在环（A依赖B，B依赖C，C依赖A），表示存在循环依赖。
 
