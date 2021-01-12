@@ -647,6 +647,16 @@ spring实现的技术为： JDK提供的动态代理技术 和 CGLIB(动态字�
 #### @Autowired
 
 1. 可以注入List、Map、数组等相同类型bean。源码中doResolveDependency方法调用了resolveMultipleBeans方法：判断注入类型。
+   1. 如果想注入Map，来替代switch重构代码。可以考虑：
+   
+   	private Map<String, ISendableConverter> converters;
+
+        // Function.identity()返回一个输出跟输入一样的Lambda表达式对象，等价于形如 t -> t
+	@Autowired
+	public Foo(Set<ISendableConverter> converters) {
+	    this.conveters = converters.stream()
+		.collect(Collectors.toMap(ISendableConverter::getType, Function.identity()));
+	}
 
 2. Autowired、Resource两者区别：一旦涉及到泛型。如T为beanA，Autowired将根据`IUserService<beanA>`注入，而Resource将根据`IUserService<T>`进行注入。如果此时有2个以上的`IUserService<T>`类型，虽然T不一样，但是依然会产生冲突，报错。
 
@@ -661,7 +671,6 @@ spring实现的技术为： JDK提供的动态代理技术 和 CGLIB(动态字�
 
    1. 该方法如果有参数，会使用autowired的方式在spring容器中查找是否有该参数。
    2. 会执行该方法。因此，这个注解比较适合注册机制。目前看来更适合用于构造函数问题。
-
    3. 作用在构造器上。底层注入流程就相当于是使用构造函数进行依赖注入了。
 
 4. 作用在bean，相当于在配置文件中配置bean，并且使用setter注入。
