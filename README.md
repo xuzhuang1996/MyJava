@@ -52,6 +52,7 @@
 12. `git merge branch name`合并到当前分支
 13. `git pull <远程库名> <远程分支名>:<本地分支名>`从远程库中获取某个分支的更新，再与本地指定的分支进行自动merge。`git pull origin develop`如果是要与本地当前分支merge，则冒号后面的<本地分支名>可以不写.
 14. rebase的作用简要概括为：可以对某一段线性提交历史进行编辑、删除、复制、粘贴；`git rebase -i HEAD~3 `,`git rebase -i 36224db`.
+15. 将某个commit复用到另一个分支：`git checkout master`后`git cherry-pick 62ecb3`，将其用到master。commit可以跨分支
 ## maven
 1. 在idea中，maven编译通过，但是idea启动debug失败，即build也不成功。
    - edit debug->bufore launch->删除build->添加maven goal->输入compile。
