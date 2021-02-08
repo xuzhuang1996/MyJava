@@ -394,6 +394,20 @@ finishBeanFactoryInitialization(beanFactory);
    2. 代理模式。动态代理：在内存中构建的，不需要手动编写代理类。静态代理：需要手工编写代理类，代理类引用被代理对象。
 
 ## bean的生命周期
+### 1.实例化
+1. 实例化之前。
+   - 工厂后处理器接口方法的作用是在应用上下文装配配置文件或配置类，以及扫描完Bean后立即调用。如`BeanFactoryPostProcessor`，让用户能接触到Bean在Spring中的内部表示对象BeanDefinition。来张图
+   - 实例化后置处理器的postProcessBeforeInstantiation()方法在Bean实例化之前调用。待定。
+2. 实例化之后。实例化后置处理器的postProcessAfterInstantiation()方法在Bean实例化之后属性赋值之前调用，可用于自定义字段注入。接口方法返回false时，表明将忽略属性设置阶段，以该阶段为准。
+### 2.属性赋值
+1. 普通属性赋值之前。实例化后置处理器的postProcessPropertyValues()方法在属性赋值之前调用，此时属性值还未被设置，可以检查Bean的所有依赖项是否以满足，比如基于Bean的setter方法上的“required”注解。
+1. 普通属性赋值后。注入容器相关属性如aware接口。
+### 3.初始化
+1. 初始化之前。BeanPostProcessor的postProcessBeforeInitialization()方法在Bean属性赋值之后初始化方法之前调用。如为当前Bean提供代理实现。
+2. 初始化。自定义一些初始化方法，如自己做注册机制等，**@PostConstruct**等。
+3. 初始化之后。BeanPostProcessor的postProcessAfterInitialization()方法在Bean初始化方法之后调用。
+### 4.使用中
+### 5.销毁
 
 ## spring AOP
 
