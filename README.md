@@ -28,6 +28,9 @@
 1. 比较两个文件不同处：复制一个文件，全选。在另一个文件中右键，选择compare with clipBroad
 1. 直接对比，开分隔窗。window->Editor tab-> split vertical
 1. intellij IDEA Properties中文unicode自动转码处理:File | Settings | Editor | File Encoding 下，勾选Transparent native-to-ascii conversion,UTF-8.适用：IDEA Properties文件常用于存储国际化内容，为避免编码差异，文件的中文通常要进行unicode编码。
+1. idea项目的.idea/workspace.xml中设置一行代码：`<property name="dynamic.classpath" value="true" />`。命令此选项控制如何通过命令行或文件将类路径传递给JVM。大多数操作系统都有最大命令行限制，如果超过该限制，IDEA将无法运行您的应用程序。当命令行的长度超过32768个字符时：
+   1. IDEA建议您切换到动态类路径。长类路径被写入文件，然后由应用程序启动器读取并通过系统类加载器加载。
+   2. 另一个建议是：配置中的shorten command line从user local 切换为classpath file。这个千万别切。在使用powerMock时导致类加载器用成了powermock的，而不是appclassLoader
 ----------
 ## git
 1. `git remote update origin --prune`   # 更新远程主机origin 整理分支
