@@ -60,7 +60,7 @@
 1. 在idea中，maven编译通过，但是idea启动debug失败，即build也不成功。
    - edit debug->bufore launch->删除build->添加maven goal->输入compile。
 2. `mvn install --settings c:\user\settings.xml `,指定maven文件进行打包。
-3. 1. windous 打包Linux部署
+3. windous 打包Linux部署
 
    ```xml
    ant.fixcrlf(srcdir: "${unzipdir}", includes: "**/*.sh, **/*.json", eol: "lf", eof:"remove" )
