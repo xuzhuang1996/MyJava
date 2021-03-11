@@ -271,3 +271,10 @@
       } 
    }
    ```
+   
+## 实战
+1. Windows查进程号jps或者jconsole
+2. `jmap –heap $PID`查看堆内存，关注年轻、老年代占用。
+3. `jmap –histo $PID | head -10`占用内存最多的对象
+4. `jstack $PID`查看线程数是否正常
+5. `jstat –gcutil`查看GC情况，如果Full GC过多，值得关注
