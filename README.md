@@ -66,3 +66,5 @@
    ```xml
    ant.fixcrlf(srcdir: "${unzipdir}", includes: "**/*.sh, **/*.json", eol: "lf", eof:"remove" )
    ```
+## Java知识体系参考
+1. [Java 全栈知识体系](https://www.pdai.tech/)
