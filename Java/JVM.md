@@ -273,12 +273,13 @@
    ```
    
 ## 实战
+### 解决堆内存问题
 1. Windows查进程号jps或者jconsole
 2. `jmap –heap $PID`查看堆内存，关注年轻、老年代占用。
 3. `jmap –histo $PID | head -10`占用内存最多的对象
 4. `jstack $PID`查看线程数是否正常
 5. `jstat –gcutil`查看GC情况，如果Full GC过多，值得关注
-##
+### 解决CPU高等线程问题
 1. top查看CPU高的进程pid
 1. jstack pid，查看dump信息。查看是否出现deadlock关键字。没有的话，查看该进程中所有线程名，看运行到哪了。查看相关代码。
 2. 如果无法使用jstack：
