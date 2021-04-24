@@ -12,7 +12,7 @@ typora-copy-images-to: .assets
 
 ### 描述
 
-作用：核心方法是 `refresh()` 方法，用于从资源文件加载类定义、扩展容器的功能。
+作用：spring上下文，ApplicationContext可以访问该容器的各项配置资源。例如，开发人员注册很多bean到spring容器中，ApplicationContext可以在spring容器启动完成以后，访问这些bean。核心方法是 `refresh()` 方法，用于从资源文件加载类定义、扩展容器的功能。
 
 应用：
 
@@ -393,17 +393,32 @@ finishBeanFactoryInitialization(beanFactory);
    1. 装饰器模式。Spring中用到的包装器模式在类名上有两种表现：一种是类名中含有Wrapper，另一种是类名中含有Decorator。动态地给一个对象添加一些额外的职责。就增加功能来说，Decorator模式相比生成子类更为灵活。
    2. 代理模式。动态代理：在内存中构建的，不需要手动编写代理类。静态代理：需要手工编写代理类，代理类引用被代理对象。
 
-## bean的生命周期
+## Bean的生命周期
+
+Bean的完整生命周期，从spring容器开始实例化Bean开始，直到最终销毁Bean。经历了5个关键点，每个关键点涉及特定的方法调用，这些方法可以大致分为4类：
+
+1. Bean自身的方法：构造方法、getter、setter、自定义的init方法。
+2. Bean级的生命周期接口方法：`*Aware`接口，InitializingBean、DisposableBean，这些接口方法由Bean类直接实现。
+3. Spring容器级的生命周期方法：InstantiationAwareBeanPostProcessor、BeanPostProcessor，这些接口的实现类一般为后置处理器。这类接口一般不由Bean本身实现，与Bean不同，实现类以容器附加装置的形式注册到Spring容器中。当Spring容器创建任何Bean的时候，这些后置处理器都会发生作用，具有全局性。
+4. 工厂后处理接口方法：BeanFactoryPostProcessor，在ApplicationContext加载配置文件、配置类，以及扫描完Bean后立即调用。
+
+### 图解
+
+![bean](.assets/bean.png)
+
 ### 1.实例化
-1. 实例化之前。
-   - 工厂后处理器接口方法的作用是在应用上下文装配配置文件或配置类，以及扫描完Bean后立即调用。如`BeanFactoryPostProcessor`，让用户能接触到Bean在Spring中的内部表示对象BeanDefinition。来张图
-   - 实例化后置处理器的postProcessBeforeInstantiation()方法在Bean实例化之前调用。待定。
-2. 实例化之后。实例化后置处理器的postProcessAfterInstantiation()方法在Bean实例化之后属性赋值之前调用，可用于自定义字段注入。接口方法返回false时，表明将忽略属性设置阶段，以该阶段为准。
+1. 实例化之前
+   - 工厂后处理器接口方法的作用是在应用上下文装配配置文件或配置类，以及扫描完Bean后立即调用。如`BeanFactoryPostProcessor`，让用户能接触到Bean在Spring中的内部表示对象BeanDefinition。
+   - 实例化后置处理器`InstantiationAwareBeanPostProcessor#postProcessBeforeInstantiation()`方法在Bean实例化之前调用，返回值可以用来代替原本该生成的Bean对象，如代理对象。当该方法实现后，Bean的实例化的构造方法不会被调用。这里推荐InstantiationAwareBeanPostProcessorAdapter适配器来实现该接口。
+2. 实例化之后
+   - 实例化后置处理器`InstantiationAwareBeanPostProcessor#postProcessAfterInstantiation()`方法在Bean实例化之后属性赋值之前调用，可用于自定义字段注入。接口方法返回false时，表明将忽略属性设置阶段，以该阶段为准。
 ### 2.属性赋值
-1. 普通属性赋值之前。实例化后置处理器的postProcessPropertyValues()方法在属性赋值之前调用，此时属性值还未被设置，可以检查Bean的所有依赖项是否以满足，比如基于Bean的setter方法上的“required”注解。
-1. 普通属性赋值后。注入容器相关属性如aware接口。
+1. 普通属性赋值之前。
+   - 实例化后置处理器的postProcessProperties()方法在属性赋值之前调用，返回的PropertyValues将应用到bean中，@Autowired、@Resource等就是根据这个回调来实现最终注入依赖的属性的。可以使用spring默认实现的注入类。
+1. 普通属性赋值后。
+   - 注入容器相关属性如aware接口。
 ### 3.初始化
-1. 初始化之前。BeanPostProcessor的postProcessBeforeInitialization()方法在Bean属性赋值之后初始化方法之前调用。如为当前Bean提供代理实现。
+1. 初始化之前。BeanPostProcessor的postProcessBeforeInitialization()方法在Bean属性赋值之后初始化方法之前调用。此时的bean已经填充属性，返回的bean实例可能是原始bean的包装器。如为当前Bean提供代理实现，对已经注入的属性进行校验或者解析。
 2. 初始化。自定义一些初始化方法，如自己做注册机制等，**@PostConstruct**等。
 3. 初始化之后。BeanPostProcessor的postProcessAfterInitialization()方法在Bean初始化方法之后调用。
 ### 4.使用中
