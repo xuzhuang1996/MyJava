@@ -282,7 +282,7 @@
 ### 解决CPU高等线程问题
 1. top查看CPU高的进程pid
 1. jstack pid，查看dump信息。查看是否出现deadlock关键字。没有的话，查看该进程中所有线程名，看运行到哪了。查看相关代码。
-2. 如果无法使用jstack：
+2. 由于jstack.log里面线程id是16进制，需要对线程id 做16进程转换：
    1. top -Hp pid查看占有CPU最多的线程的nid。
    2. printf "%x\n" nid，获取线程ID的十六进制。
    3. kill -3 pid打印线程dump信息，然后查看线程ID对应的信息，进行分析。
