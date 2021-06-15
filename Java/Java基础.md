@@ -10,7 +10,6 @@
 2. hashmap的equal和hashcode为什么要同时重写:如果你重载了equals，比如说是基于对象的内容实现的，而保留hashCode的实现不变，那么很可能某两个对象明明是“相等”，而hashCode却不一样。
 
 ### 泛型
-
 1. `List<?>`、`List`、`List<Object>`三者区别：
 
 | 引用变量的类型 | 名称                             | 可以接受的类型                           | 能否添加元素           |
@@ -25,6 +24,9 @@
 2. 通配符和边界
    - `<? extends T>`,上界通配符。能放一切继承自T的类.频繁往外读取内容的,适合用<? extends T >。
    - `<? super T>`,下界通配符。能放T及T继承的类，但不能放T的派生类。经常往里插入的,适合用 <? super T> 。
+
+3. [参考:`List<Object>和List<?>`的区别](https://www.jianshu.com/p/f25da582f592)
+4. 
 
 ### 正则
 
