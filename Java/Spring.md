@@ -29,7 +29,9 @@ AnnotationConfigApplicationContext applicationContext = new AnnotationConfigAppl
 
 ### refresh流程
 
-#### 准备工作
+refresh的目的：destroy之前的，create新的。
+
+#### 1、准备工作
 
 记录下容器的启动时间、标记“已启动”状态、处理配置文件中的占位符。
 
@@ -37,7 +39,7 @@ AnnotationConfigApplicationContext applicationContext = new AnnotationConfigAppl
 prepareRefresh();
 ```
 
-#### 创建 BeanFactory
+#### 2、创建 BeanFactory
 
 创建 Bean 容器，加载并注册 Bean。将配置文件解析成一个个 Bean 定义，注册到 `BeanFactory` 中。
 
@@ -52,7 +54,7 @@ ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 2. 该流程的方法实现
 
 ```java
-// AbstractApplicationContext.java
+    // AbstractApplicationContext.java
 	protected ConfigurableListableBeanFactory obtainFreshBeanFactory() {
 		refreshBeanFactory();
 		return getBeanFactory();
@@ -63,20 +65,20 @@ ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
    - 简单工厂。实质是由一个工厂类根据传入的参数，动态决定应该创建哪一个产品类。包括：
 
-     1. 各种的Aware接口，比如 `BeanFactoryAware`，对于实现了这些Aware接口的bean，在实例化bean时Spring会帮我们注入对应的`BeanFactory`的实例。
+     1. 各种的Aware接口。比如 `BeanFactoryAware`，对于实现了这些Aware接口的bean，在实例化bean时Spring会帮我们注入对应的`BeanFactory`的实例。
 
-     2. `BeanPostProcessor`接口，实现了`BeanPostProcessor`接口的bean，在实例化bean时Spring会帮我们调用接口中的方法。
+     2. `BeanPostProcessor`接口。实现了`BeanPostProcessor`接口的bean，在实例化bean时Spring会帮我们调用接口中的方法。
 
-     3. `InitializingBean`接口，实现了`InitializingBean`接口的bean，在实例化bean时Spring会帮我们调用接口中的方法。
+     3. `InitializingBean`接口。实现了`InitializingBean`接口的bean，在实例化bean时Spring会帮我们调用接口中的方法。
 
-     4. `DisposableBean`接口，实现了`BeanPostProcessor`接口的bean，在该bean死亡时Spring会帮我们调用接口中的方法。
+     4. `DisposableBean`接口。实现了`BeanPostProcessor`接口的bean，在该bean死亡时Spring会帮我们调用接口中的方法。
 
         > 通过Spring接口的暴露，在实例化bean的阶段我们可以进行一些额外的处理，这些额外的处理只需要让bean实现对应的接口即可，那么spring就会在bean的生命周期调用我们实现的接口来处理该bean。
 
-   - 模板方法1。`AbstractApplicationContext`的`refreshBeanFactory`方法，以`ClassPathXmlApplicationContext`为例，该类最终也是继承了`AbstractRefreshableApplicationContext`的`refreshBeanFactory`方法。
+   - 模板方法。`AbstractApplicationContext`的`refreshBeanFactory`方法，以`ClassPathXmlApplicationContext`为例，该类最终也是继承了`AbstractRefreshableApplicationContext`的`refreshBeanFactory`方法。
 
      ```java
-     // AbstractRefreshableApplicationContext.java
+         // AbstractRefreshableApplicationContext.java
          @Override
      	protected final void refreshBeanFactory() throws BeansException {
      		if (hasBeanFactory()) {
@@ -84,26 +86,23 @@ ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
      			closeBeanFactory();
      		}
      		try {
-              // 初始化DefaultListableBeanFactory，该类基本包含所有BeanFactory的实现
+                 // 初始化DefaultListableBeanFactory，该类基本包含所有BeanFactory的实现
      			DefaultListableBeanFactory beanFactory = createBeanFactory();
       			// 设置 BeanFactory 的两个配置属性：是否允许 Bean 覆盖、是否允许循环引用
      			customizeBeanFactory(beanFactory);
-              // 加载 Bean 到 BeanFactory 中。该方法的命名很好，结合了参数。
+                 // 加载 Bean 到 BeanFactory 中。该方法的命名很好，结合了参数。
      			loadBeanDefinitions(beanFactory);
      			this.beanFactory = beanFactory;
-     		}
      		}
      	}
      
      ```
-
-   - refresh方式的目的：destroy之前的，create新的。
-
-   - 模板方法2。`AbstractRefreshableApplicationContext`的`loadBeanDefinitions`方法为抽象方法。这里的可扩展性在于，**未对加载方法进行要求，也就是可以从不同来源的不同类型的资源进行加载**。
-
-     ```java
-     // AbstractXmlApplicationContext.java
-     	@Override
+     
+- 模板方法。`AbstractRefreshableApplicationContext`的`loadBeanDefinitions`方法为抽象方法。这里的可扩展性在于，**未对加载方法进行要求，也就是可以从不同来源的不同类型的资源进行加载**。
+   
+  ```java
+         // AbstractXmlApplicationContext.java
+  	@Override
      	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
      		// 给这个 BeanFactory 实例化一个 XmlBeanDefinitionReader.
      		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
@@ -111,12 +110,12 @@ ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
      		loadBeanDefinitions(beanDefinitionReader);
      	}
      ```
-
-   - 模板方法3。模板方法模式和回调模式的结合，是Template Method不需要继承的一种实现方式。例如，JDBC的抽象和对Hibernate的集成，都采用了一种理念或者处理方式。[JdbcTemplate](https://blog.csdn.net/weixin_40001125/article/details/88538576)
-
-     > 匿名类：如果某个步骤依赖某个操作，该操作只使用一次，为了避免采用注入方式进行依赖。可以采用匿名内部类。
+   
+   - 模板方法。模板方法模式和回调模式的结合，是Template Method不需要继承的一种实现方式。例如，JDBC的抽象和对Hibernate的集成，都采用了一种理念或者处理方式。[JdbcTemplate](https://blog.csdn.net/weixin_40001125/article/details/88538576)
+   
+  > 匿名类：如果某个步骤依赖某个操作，该操作只使用一次，为了避免采用注入方式进行依赖。可以采用匿名内部类。
      
-     ```java
+  ```java
      // 采用模板方法模式是为了以一种统一而集中的方式来处理资源的获取和释放
      // JdbcTemplate是抽象类，不能够独立使用，我们每次进行数据访问的时候都要给出一个相应的子类实现,这样肯定不方便，所以就引入了回调 。
      public class JdbcTemplate {  
@@ -170,7 +169,7 @@ ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
      ```
 
 
-#### 设置 BeanFactory 类加载器
+#### 3、设置 BeanFactory 类加载器
 
 添加几个`BeanPostProcessor`，手动注册几个特殊的 bean。
 
@@ -194,9 +193,9 @@ beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(this));
 
 1. [BeanNameAware](https://www.jianshu.com/p/c5c61c31080b)
 
-#### postProcessBeanFactory
+#### 4、postProcessBeanFactory
 
-提供子类扩展点。如果配置的bean有实现`BeanFactoryPostProcessor`接口，那么在容器初始化以后，Spring 会负责调用一些bean实现的该接口里面的 `postProcessBeanFactory` 方法。该接口对所有Bean处理，唯一作用是修改Bean的定义，如PropertyPlaceholderConfigurer接口解析完配置文件后，通过访问者模式，进行占位符替换。
+提供子类扩展点。spring中并没有具体去实现postProcessBeanFactory方法，是提供给想要实现BeanPostProcessor的三方框架使用的。谁要使用谁就去实现。如果配置的bean有实现`BeanFactoryPostProcessor`接口，那么在容器初始化以后，Spring 会负责调用一些bean实现的该接口里面的 `postProcessBeanFactory` 方法。该接口对所有Bean处理，唯一作用是修改Bean的定义，如PropertyPlaceholderConfigurer接口解析完配置文件后，通过访问者模式，进行占位符替换。
 
 ```java
 postProcessBeanFactory(beanFactory);
