@@ -196,7 +196,7 @@ beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(this));
 
 #### postProcessBeanFactory
 
-提供子类扩展点。如果配置的bean有实现`BeanFactoryPostProcessor`接口，那么在容器初始化以后，Spring 会负责调用一些bean实现的该接口里面的 `postProcessBeanFactory` 方法。
+提供子类扩展点。如果配置的bean有实现`BeanFactoryPostProcessor`接口，那么在容器初始化以后，Spring 会负责调用一些bean实现的该接口里面的 `postProcessBeanFactory` 方法。该接口对所有Bean处理，唯一作用是修改Bean的定义，如PropertyPlaceholderConfigurer接口解析完配置文件后，通过访问者模式，进行占位符替换。
 
 ```java
 postProcessBeanFactory(beanFactory);

@@ -288,3 +288,7 @@ EXT2、EXT3的区别如下：
 ![image text](https://github.com/xuzhuang1996/MyJava/blob/master/img/linux/vimCommand.png)
 ![image text](https://github.com/xuzhuang1996/MyJava/blob/master/img/linux/vimEnd.png)
 ![image text](https://github.com/xuzhuang1996/MyJava/blob/master/img/linux/vimex.png)
+
+## 参考
+[查看历史命令行](https://www.cnblogs.com/linyfeng/p/12730118.html)
+

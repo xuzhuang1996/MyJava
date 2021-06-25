@@ -69,3 +69,5 @@
    ```
 ## Java知识体系参考
 1. [Java 全栈知识体系](https://www.pdai.tech/)
+2. [spring5实战](https://potoyang.gitbook.io/spring-in-action-v5/)
+3. [java书](https://www.bookstack.cn/)
