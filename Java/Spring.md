@@ -47,11 +47,11 @@ prepareRefresh();
 ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 ```
 
-1. BeanFactory继承关系
+##### BeanFactory继承关系
 
 ![](.assets/3.png)
 
-2. 该流程的方法实现
+##### 该流程的方法实现
 
 ```java
     // AbstractApplicationContext.java
@@ -61,112 +61,112 @@ ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 	}
 ```
 
-3. 该流程中涉及的设计模式
+##### 该流程中涉及的设计模式
 
-   - 简单工厂。实质是由一个工厂类根据传入的参数，动态决定应该创建哪一个产品类。包括：
+- 简单工厂。实质是由一个工厂类根据传入的参数，动态决定应该创建哪一个产品类。包括：
 
-     1. 各种的Aware接口。比如 `BeanFactoryAware`，对于实现了这些Aware接口的bean，在实例化bean时Spring会帮我们注入对应的`BeanFactory`的实例。
+  1. 各种的Aware接口。比如 `BeanFactoryAware`，对于实现了这些Aware接口的bean，在实例化bean时Spring会帮我们注入对应的`BeanFactory`的实例。
 
-     2. `BeanPostProcessor`接口。实现了`BeanPostProcessor`接口的bean，在实例化bean时Spring会帮我们调用接口中的方法。
+  2. `BeanPostProcessor`接口。实现了`BeanPostProcessor`接口的bean，在实例化bean时Spring会帮我们调用接口中的方法。
 
-     3. `InitializingBean`接口。实现了`InitializingBean`接口的bean，在实例化bean时Spring会帮我们调用接口中的方法。
+  3. `InitializingBean`接口。实现了`InitializingBean`接口的bean，在实例化bean时Spring会帮我们调用接口中的方法。
 
-     4. `DisposableBean`接口。实现了`BeanPostProcessor`接口的bean，在该bean死亡时Spring会帮我们调用接口中的方法。
+  4. `DisposableBean`接口。实现了`BeanPostProcessor`接口的bean，在该bean死亡时Spring会帮我们调用接口中的方法。
 
-        > 通过Spring接口的暴露，在实例化bean的阶段我们可以进行一些额外的处理，这些额外的处理只需要让bean实现对应的接口即可，那么spring就会在bean的生命周期调用我们实现的接口来处理该bean。
+     > 通过Spring接口的暴露，在实例化bean的阶段我们可以进行一些额外的处理，这些额外的处理只需要让bean实现对应的接口即可，那么spring就会在bean的生命周期调用我们实现的接口来处理该bean。
 
-   - 模板方法。`AbstractApplicationContext`的`refreshBeanFactory`方法，以`ClassPathXmlApplicationContext`为例，该类最终也是继承了`AbstractRefreshableApplicationContext`的`refreshBeanFactory`方法。
+- 模板方法。`AbstractApplicationContext`的`refreshBeanFactory`方法，以`ClassPathXmlApplicationContext`为例，该类最终也是继承了`AbstractRefreshableApplicationContext`的`refreshBeanFactory`方法。
 
-     ```java
-         // AbstractRefreshableApplicationContext.java
-         @Override
-     	protected final void refreshBeanFactory() throws BeansException {
-     		if (hasBeanFactory()) {
-     			destroyBeans();
-     			closeBeanFactory();
-     		}
-     		try {
-                 // 初始化DefaultListableBeanFactory，该类基本包含所有BeanFactory的实现
-     			DefaultListableBeanFactory beanFactory = createBeanFactory();
-      			// 设置 BeanFactory 的两个配置属性：是否允许 Bean 覆盖、是否允许循环引用
-     			customizeBeanFactory(beanFactory);
-                 // 加载 Bean 到 BeanFactory 中。该方法的命名很好，结合了参数。
-     			loadBeanDefinitions(beanFactory);
-     			this.beanFactory = beanFactory;
-     		}
-     	}
-     
-     ```
-     
+  ```java
+      // AbstractRefreshableApplicationContext.java
+      @Override
+  	protected final void refreshBeanFactory() throws BeansException {
+  		if (hasBeanFactory()) {
+  			destroyBeans();
+  			closeBeanFactory();
+  		}
+  		try {
+              // 初始化DefaultListableBeanFactory，该类基本包含所有BeanFactory的实现
+  			DefaultListableBeanFactory beanFactory = createBeanFactory();
+   			// 设置 BeanFactory 的两个配置属性：是否允许 Bean 覆盖、是否允许循环引用
+  			customizeBeanFactory(beanFactory);
+              // 加载 Bean 到 BeanFactory 中。该方法的命名很好，结合了参数。
+  			loadBeanDefinitions(beanFactory);
+  			this.beanFactory = beanFactory;
+  		}
+  	}
+  
+  ```
+  
 - 模板方法。`AbstractRefreshableApplicationContext`的`loadBeanDefinitions`方法为抽象方法。这里的可扩展性在于，**未对加载方法进行要求，也就是可以从不同来源的不同类型的资源进行加载**。
-   
+
   ```java
-         // AbstractXmlApplicationContext.java
+      // AbstractXmlApplicationContext.java
   	@Override
-     	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
-     		// 给这个 BeanFactory 实例化一个 XmlBeanDefinitionReader.
-     		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
-             // 用初始化的 Reader 开始来加载 xml 配置
-     		loadBeanDefinitions(beanDefinitionReader);
-     	}
-     ```
-   
-   - 模板方法。模板方法模式和回调模式的结合，是Template Method不需要继承的一种实现方式。例如，JDBC的抽象和对Hibernate的集成，都采用了一种理念或者处理方式。[JdbcTemplate](https://blog.csdn.net/weixin_40001125/article/details/88538576)
-   
+  	protected void loadBeanDefinitions(DefaultListableBeanFactory beanFactory) throws BeansException, IOException {
+  		// 给这个 BeanFactory 实例化一个 XmlBeanDefinitionReader.
+  		XmlBeanDefinitionReader beanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+          // 用初始化的 Reader 开始来加载 xml 配置
+  		loadBeanDefinitions(beanDefinitionReader);
+  	}
+  ```
+
+- 模板方法。模板方法模式和回调模式的结合，是Template Method不需要继承的一种实现方式。例如，JDBC的抽象和对Hibernate的集成，都采用了一种理念或者处理方式。[JdbcTemplate](https://blog.csdn.net/weixin_40001125/article/details/88538576)
+
   > 匿名类：如果某个步骤依赖某个操作，该操作只使用一次，为了避免采用注入方式进行依赖。可以采用匿名内部类。
-     
+  
   ```java
-     // 采用模板方法模式是为了以一种统一而集中的方式来处理资源的获取和释放
-     // JdbcTemplate是抽象类，不能够独立使用，我们每次进行数据访问的时候都要给出一个相应的子类实现,这样肯定不方便，所以就引入了回调 。
-     public class JdbcTemplate {  
-         public final Object execute（StatementCallback callback）{  
-             Connection con=null;  
-             Statement stmt=null;  
-             try{  
-                 con=getConnection（）;  
-                 stmt=con.createStatement（）;  
-                 // 回调，callback类型为StatementCallback
-                 Object retValue=callback.doWithStatement(stmt);  
-                 return retValue;  
-             }catch（SQLException e）{  
-                 ...  
-             }finally{  
-                 closeStatement（stmt）;  
-                 releaseConnection（con）;  
-             }  
-         }  
-     
-         ...//其它方法定义  
-     }   
-     
-     // 回调接口定义
-     public interface StatementCallback{  
-         Object doWithStatement（Statement stmt）;  
-     }
-     
-     // 使用方法1。采用匿名类的方式，或者如果只有一个抽象方法，可以使用lambda表示式，如Runnable
-     JdbcTemplate jdbcTemplate;  
-     final String sql;  
-     StatementCallback callback = new StatementCallback() {  
-     	public Object doWithStatement(Statement stmt){  
-             return ...;  
-         }  
-     }    
-     jdbcTemplate.execute(callback);
-     
-     // 使用方法2
-     public void test() {
-             String sql = "insert into test(name) values (?)";
-             //返回的是更新的行数
-             int count = jdbcTemplate.update(sql, new PreparedStatementSetter(){
-                 @Override
-                 public void setValues(PreparedStatement pstmt)
-                         throws SQLException {
-                     pstmt.setObject(1, "name4"); 
-                 }
-             });
-     }
-     ```
+  // 采用模板方法模式是为了以一种统一而集中的方式来处理资源的获取和释放
+  // JdbcTemplate是抽象类，不能够独立使用，我们每次进行数据访问的时候都要给出一个相应的子类实现,这样肯定不方便，所以就引入了回调 。
+  public class JdbcTemplate {  
+      public final Object execute（StatementCallback callback）{  
+          Connection con=null;  
+          Statement stmt=null;  
+          try{  
+              con=getConnection（）;  
+              stmt=con.createStatement（）;  
+              // 回调，callback类型为StatementCallback
+              Object retValue=callback.doWithStatement(stmt);  
+              return retValue;  
+          }catch（SQLException e）{  
+              ...  
+          }finally{  
+              closeStatement（stmt）;  
+              releaseConnection（con）;  
+          }  
+      }  
+  
+      ...//其它方法定义  
+  }   
+  
+  // 回调接口定义
+  public interface StatementCallback{  
+      Object doWithStatement（Statement stmt）;  
+  }
+  
+  // 使用方法1。采用匿名类的方式，或者如果只有一个抽象方法，可以使用lambda表示式，如Runnable
+  JdbcTemplate jdbcTemplate;  
+  final String sql;  
+  StatementCallback callback = new StatementCallback() {  
+  	public Object doWithStatement(Statement stmt){  
+          return ...;  
+      }  
+  }    
+  jdbcTemplate.execute(callback);
+  
+  // 使用方法2
+  public void test() {
+          String sql = "insert into test(name) values (?)";
+          //返回的是更新的行数
+          int count = jdbcTemplate.update(sql, new PreparedStatementSetter(){
+              @Override
+              public void setValues(PreparedStatement pstmt)
+                      throws SQLException {
+                  pstmt.setObject(1, "name4"); 
+              }
+          });
+  }
+  ```
 
 
 #### 3、设置 BeanFactory 类加载器
@@ -177,7 +177,7 @@ ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 prepareBeanFactory(beanFactory);
 ```
 
-1. 该流程方法部分代码：
+该流程方法部分代码：
 
 ```java
 // 添加一个BeanPostProcessor。即添加调用者。
@@ -189,58 +189,57 @@ beanFactory.addBeanPostProcessor(new ApplicationContextAwareProcessor(this));
 beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(this));
 ```
 
-> Spring中有很多继承于`aware`中的接口，这些接口是能感知到所有`Aware`前面的含义。通过实现的set方法，保存spring容器相应的引用值，给自己用。
+#### 4、postProcessBeanFactory，提供子类扩展点，允许在上下文的子类中对bean factory进行后处理
 
-1. [BeanNameAware](https://www.jianshu.com/p/c5c61c31080b)
-
-#### 4、postProcessBeanFactory
-
-提供子类扩展点。spring中并没有具体去实现postProcessBeanFactory方法，是提供给想要实现BeanPostProcessor的三方框架使用的。谁要使用谁就去实现。如果配置的bean有实现`BeanFactoryPostProcessor`接口，那么在容器初始化以后，Spring 会负责调用一些bean实现的该接口里面的 `postProcessBeanFactory` 方法。该接口对所有Bean处理，唯一作用是修改Bean的定义，如PropertyPlaceholderConfigurer接口解析完配置文件后，通过访问者模式，进行占位符替换。
+spring启动流程中并没有具体去实现postProcessBeanFactory方法，是提供给想要实现BeanPostProcessor的三方框架使用的。比如，一些 Web 的 ApplicationContext（AbstractRefreshableWebApplicationContext），就实现了自己的逻辑，做一些 Web 相关的事情。
 
 ```java
 postProcessBeanFactory(beanFactory);
 ```
 
-#### invokeBeanFactoryPostProcessors
+#### 5、invokeBeanFactoryPostProcessors，调用BeanFactoryPostProcessor的实现类的后置方法
 
-1. 调用` BeanFactoryPostProcessor` 各个实现类的`postProcessBeanFactory(beanFactory)` 方法。
+如果配置的bean有实现`BeanFactoryPostProcessor`接口，那么在容器初始化以后，Spring 会负责调用一些bean实现的该接口里面的 `postProcessBeanFactory` 方法。该接口对所有Bean处理，唯一作用是修改Bean的定义，如PropertyPlaceholderConfigurer接口解析完配置文件后，通过访问者模式，进行占位符替换。
 
-   ```java
-   invokeBeanFactoryPostProcessors(beanFactory);
-   ```
+```java
+invokeBeanFactoryPostProcessors(beanFactory);
+```
 
-#### registerBeanPostProcessors
+##### 访问者模式
 
-1. 将所有实现`BeanPostProcessor`接口的bean注册到`BeanFactory` 维护的 `BeanPostProcessor` 列表`beanPostProcessors`中。在创建bean的过程中，遍历所有的`beanPostProcessors`，从而调用相关方法。具体可以研究下面的`getBean`方法。
+1. 组成
+2. 原理
 
-   > `BeanPostProcessor`接口两个方法: `postProcessBeforeInitialization `和 `postProcessAfterInitialization`。两个方法分别在 Bean 初始化之前和初始化之后得到执行。
+#### 6、registerBeanPostProcessors
 
-   ```java
-   registerBeanPostProcessors(beanFactory);
-   ```
+将所有实现`BeanPostProcessor`接口的bean注册到`BeanFactory` 维护的 `BeanPostProcessor` 列表`beanPostProcessors`中。在创建bean的过程中，遍历所有的`beanPostProcessors`，从而调用相关方法。具体可以研究下面的`getBean`方法。
 
-2. `BeanPostProcessor`接口可以对bean实例做一些自定义修改，包括下面两种方法。使用方式如下。
+```java
+registerBeanPostProcessors(beanFactory);
+```
 
-   ```java
-   @Component
-   public class MyBeanPostProcessor implements BeanPostProcessor {
-       // bean在初始化之前需要调用的方法
-       @Override
-       public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-           System.out.println(beanName + " MyBeanPostProcessor#MyBeanPostProcessor");
-           return bean;
-       }
-   
-       // bean在初始化之后需要调用的方法
-       @Override
-       public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-           System.out.println(beanName + " MyBeanPostProcessor#postProcessAfterInitialization");
-           return bean;
-       }
-   }
-   ```
+`BeanPostProcessor`接口可以对bean实例做一些自定义修改，包括下面两种方法。使用方式如下。
 
-#### 注册事件监听器
+```java
+@Component
+public class MyBeanPostProcessor implements BeanPostProcessor {
+    // bean在初始化之前需要调用的方法
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println(beanName + " MyBeanPostProcessor#MyBeanPostProcessor");
+        return bean;
+    }
+
+    // bean在初始化之后需要调用的方法
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        System.out.println(beanName + " MyBeanPostProcessor#postProcessAfterInitialization");
+        return bean;
+    }
+}
+```
+
+#### 7、注册事件监听器
 
    1. 监听器需要实现` ApplicationListener` 接口。
 
@@ -248,7 +247,7 @@ postProcessBeanFactory(beanFactory);
    registerListeners();
    ```
 
-#### 初始化所有singleton beans（lazy-init 除外）
+#### 8、初始化所有singleton beans（lazy-init 除外）
 
 ```java
 finishBeanFactoryInitialization(beanFactory);
@@ -257,15 +256,15 @@ finishBeanFactoryInitialization(beanFactory);
 1. 该步骤部分代码。该方法中，首先判断是否为FactoryBean，该接口的子类name需要加上`&`，即最终存在IOC容器中的name。否则调用`getBean()`方法进行初始化。
 
    ```java
-   	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
-   		// 实例化所有剩余的singletons(non-lazy-init) .
-   		beanFactory.preInstantiateSingletons();
-   	}
+   protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
+       // 实例化所有剩余的singletons(non-lazy-init) .
+       beanFactory.preInstantiateSingletons();
+   }
    ```
 
 3. 在调用`getBean()`初始化后，通过`getSingleton(beanName)`从IOC容器取出对象。
 
-4. `ConfigurableListableBeanFactory`接口。提供bean definition的解析,注册功能,再对单例来个预加载(解决循环依赖问题)。TODO。
+4. `ConfigurableListableBeanFactory`接口。提供bean definition的解析,注册功能,再对单例来个预加载(解决循环依赖问题)。TODO
 
 5. `FactoryBean`接口。当bean实现了`FactoryBean`接口，spring会在使用`getBean()`调用获得该bean时，自动调用该bean的`getObject()`方法，所以**返回的不是factory这个bean，而是这个`bean.getOjbect()`方法的返回值。**适用于 Bean 的创建过程比较复杂的场景，比如数据库连接池的创建。
 
@@ -301,7 +300,7 @@ finishBeanFactoryInitialization(beanFactory);
      }
      ```
 
-##### [getBean方法梳理](https://www.cnblogs.com/cxyAtuo/p/11626648.html)
+### getBean方法梳理
 
 1. 计算所给name对应的内部beanName 。
 
@@ -390,7 +389,6 @@ finishBeanFactoryInitialization(beanFactory);
 ## 设计模式，这节会删，并到上面的流程中
 
    1. 装饰器模式。Spring中用到的包装器模式在类名上有两种表现：一种是类名中含有Wrapper，另一种是类名中含有Decorator。动态地给一个对象添加一些额外的职责。就增加功能来说，Decorator模式相比生成子类更为灵活。
-   2. 代理模式。动态代理：在内存中构建的，不需要手动编写代理类。静态代理：需要手工编写代理类，代理类引用被代理对象。
 
 ## Bean的生命周期
 
@@ -517,7 +515,7 @@ Bean的完整生命周期，从spring容器开始实例化Bean开始，直到最
    
       ![img](.assets/10236819-4535ec062f655d39.webp)
 
-### 实现方式
+### AOP现有的实现方式
 
 spring实现的技术为： JDK提供的动态代理技术 和 CGLIB(动态字节码增强技术) 
 
@@ -533,7 +531,7 @@ spring实现的技术为： JDK提供的动态代理技术 和 CGLIB(动态字�
 
 ## spring事务
 
-### [概述](http://blog.itpub.net/69900354/viewspace-2565243/)：
+### 概述
 
 1. 如果是编译时异常不会自动回滚，如果是运行时异常，那会自动回滚！
 
@@ -649,8 +647,8 @@ spring实现的技术为： JDK提供的动态代理技术 和 CGLIB(动态字�
 
    1. Controller的方法通常不接受HttpServletRequest和HttpServletResponse参数，而是接收和返回许多不同类型的数据。而这，由RequestMappingHandlerAdapter来完成从HttpServletRequest中解析出参数。
    2. 返回值不需要返回ModelAndView，而是可以转化为json的Entity或者view的名字（具体HTML文件）
-      - 当您从hello（）方法返回一个字符串时，ViewNameMethodReturnValueHandler会处理该值
-      - 当你从login（）方法返回一个准备好的ModelAndView时，Spring使用了ModelAndViewMethodReturnValueHandler
+      - 当您从hello方法返回一个字符串时，ViewNameMethodReturnValueHandler会处理该值
+      - 当你从login方法返回一个准备好的ModelAndView时，Spring使用了ModelAndViewMethodReturnValueHandler
       - 当在方法上使用@ResponseBody批注时，Spring会转换返回值并自动将其写入HTTP响应，因此出现了RestController:对每个方法的返回值都会直接转换为json,不需在方法前面加@ResponseBody,但是不能返回jsp,html页面，视图解析器无法解析jsp,html页面
 
 7. 当前Spring已经处理了HTTP请求并收到了一个ModelAndView对象，需要呈现用户将在浏览器中看到的HTML页面。解析model将其渲染到view上， 这个model就是一个map,将里面的值一个一个赋值给request。然后发送。
@@ -674,65 +672,64 @@ spring实现的技术为： JDK提供的动态代理技术 和 CGLIB(动态字�
 4. @Inherited：说明子类可以继承父类中的该注解
 5. 一般而言，注解只是相当于定义一个用于识别的符号，真正对被注解的对象起作用的是，针对注解做的开发，即凡是注解了该注解的类，都进行某种处理。一般由拦截器来实现处理。
 
-#### @Autowired
+#### 1、@Autowired
 
-1. 可以注入List、Map、数组等相同类型bean。源码中doResolveDependency方法调用了resolveMultipleBeans方法：判断注入类型。
-   1. 如果想注入Map，来替代switch重构代码。可以考虑：
-   
-   ```java
-      private Map<String, ISendableConverter> converters;
+可以注入List、Map、数组等相同类型bean。源码中doResolveDependency方法调用了resolveMultipleBeans方法：判断注入类型。
+1. 如果想注入Map，来替代switch重构代码。可以考虑：
 
-      // Function.identity()返回一个输出跟输入一样的Lambda表达式对象，等价于形如 t -> t
-      @Autowired
-      public Foo(Set<ISendableConverter> converters) {
-         this.conveters = converters.stream()
-        	.collect(Collectors.toMap(ISendableConverter::getType, Function.identity()));
-      }
-   ```
+```java
+   private Map<String, ISendableConverter> converters;
+
+   // Function.identity()返回一个输出跟输入一样的Lambda表达式对象，等价于形如 t -> t
+   @Autowired
+   public Foo(Set<ISendableConverter> converters) {
+      this.conveters = converters.stream()
+     	.collect(Collectors.toMap(ISendableConverter::getType, Function.identity()));
+   }
+```
 
 2. Autowired、Resource两者区别：一旦涉及到泛型。如T为beanA，Autowired将根据`IUserService<beanA>`注入，而Resource将根据`IUserService<T>`进行注入。如果此时有2个以上的`IUserService<T>`类型，虽然T不一样，但是依然会产生冲突，报错。
 
-   ```java
-      @Autowired   
-      public IUserService<T> userService; 
-      @Resource   
-      public IUserService<T> userService; 
-   ```
+```java
+   @Autowired   
+   public IUserService<T> userService; 
+   @Resource   
+   public IUserService<T> userService; 
+```
 
 3. @Autowired注解作用在方法上。
 
-   1. 该方法如果有参数，会使用autowired的方式在spring容器中查找是否有该参数。
-   2. 会执行该方法。因此，这个注解比较适合注册机制。目前看来更适合用于构造函数问题。
-   3. 作用在构造器上。底层注入流程就相当于是使用构造函数进行依赖注入了。
+       - 该方法如果有参数，会使用autowired的方式在spring容器中查找是否有该参数。
+       - 会执行该方法。因此，这个注解比较适合注册机制。目前看来更适合用于构造函数问题。
+       - 作用在构造器上。底层注入流程就相当于是使用构造函数进行依赖注入了。
+       - 作用在bean，相当于在配置文件中配置bean，并且使用setter注入。
 
-4. 作用在bean，相当于在配置文件中配置bean，并且使用setter注入。
+注意：Java变量的初始化顺序为：静态变量或静态语句块–>实例变量或初始化语句块–>构造方法–>@Autowired
 
-5. Java变量的初始化顺序为：静态变量或静态语句块–>实例变量或初始化语句块–>构造方法–>@Autowired
+```java
+@RestController
+@RequestMapping("/user")
+public class UserController {
+     // 这里不加Autowired也可以成功注入。其实是通过构造函数进行的设置注入。
+     private final UserService userService;
 
-   ```java
-   @RestController
-   @RequestMapping("/user")
-   public class UserController {
-       // 这里不加Autowired也可以成功注入。其实是通过构造函数进行的设置注入。
-    private final UserService userService;
-   
     @Autowired
-       public UserController(final UserService userService) {
-           this.userService = userService;
-       }
-   
-       @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
-       @ExceptionHandler(Exception.class)
-       public void notFound() {
-       }
-   
-    public static void main(String[] args) {
-           new UserController(null);
+    public UserController(final UserService userService) {
+        this.userService = userService;
     }
-   }
-   ```
 
-#### @Bean
+    @ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Resource not found")
+    @ExceptionHandler(Exception.class)
+    public void notFound() {
+    }
+
+     public static void main(String[] args) {
+            new UserController(null);
+     }
+}
+```
+
+#### 2、@Bean
 
 [方法注解](http://arganzheng.life/spring-java-based-configuration.html)，该工厂方法返回的对象将被Spring托管。优势：在运行时期根据一些信息返回不同的bean实例（策略模式）。
 
@@ -746,5 +743,7 @@ spring实现的技术为： JDK提供的动态代理技术 和 CGLIB(动态字�
 5. https://www.jianshu.com/p/8aaad9cff96b
 6. [spring aop 调用链](https://www.jianshu.com/p/f37148c845a9)
 7. [getBean](https://www.cnblogs.com/toby-xu/p/11333479.html)
-8. [分布式锁AOP](https://developer.ibm.com/zh/languages/spring/articles/j-spring-boot-aop-web-log-processing-and-distributed-locking/)
+8. [getBean梳理](https://www.cnblogs.com/cxyAtuo/p/11626648.html)
+9. [分布式锁AOP](https://developer.ibm.com/zh/languages/spring/articles/j-spring-boot-aop-web-log-processing-and-distributed-locking/)
+10. [spring事务](http://blog.itpub.net/69900354/viewspace-2565243/)
 
