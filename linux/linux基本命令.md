@@ -225,7 +225,8 @@ Sed主要用来自动编辑一个或多个文件；简化对文件的反复操�
     - `sh FileName`
     - `bash FileName`
     - 作用:在当前bash环境下读取并执行FileName中的命令。该filename文件可以无"执行权限"
-18. 查看端口占用：lsof -i:8000
+18. 查看端口占用：`lsof -i:8000`
+18. 查询进程打开的文件：`lsof -p PID`。常用于查看某个进程中引用jar包是否冲突。如`lsof -p PID | grep "kafka"`，查看引用了哪些kafka的jar包
 19. nc命令的作用
      - 实现任意TCP/UDP端口的侦听，nc可以作为server以TCP或UDP方式侦听指定端口
      - 机器之间传输文件
